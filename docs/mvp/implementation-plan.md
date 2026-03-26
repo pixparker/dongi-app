@@ -14,7 +14,7 @@
 
 ## Phase 1: Database Schema & Security
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** Create all database tables, relationships, and row-level security so every subsequent phase has a working data layer.
 
