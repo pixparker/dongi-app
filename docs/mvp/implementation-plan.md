@@ -87,7 +87,7 @@
 
 ## Phase 4: Members, Expenses & Payments CRUD
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** Full create/read/delete for all trip entities — the core data entry layer.
 
