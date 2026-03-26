@@ -120,7 +120,7 @@
 
 ## Phase 5: Business Logic (Balances & Settlement)
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** The financial brain — calculate who owes whom and recommend the fewest transfers to settle up.
 

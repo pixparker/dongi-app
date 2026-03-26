@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
+import { calculateMemberBalances } from "@/lib/calculations";
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: "🍕",
@@ -69,46 +70,28 @@ export default async function TripDashboardPage({
     .eq("trip_id", tripId)
     .eq("is_deleted", false);
 
-  // Calculate balances
+  // Calculate balances using shared logic
   const approvedExpenses = expenses?.filter((e) => e.status === "approved") ?? [];
   const totalExpenses = approvedExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
   const memberCount = members?.length ?? 0;
 
-  const balances: Record<string, { paid: number; share: number; received: number; sent: number }> = {};
-  members?.forEach((m) => {
-    balances[m.user_id] = { paid: 0, share: 0, received: 0, sent: 0 };
+  const balanceResults = calculateMemberBalances({
+    members: members ?? [],
+    expenses: expenses ?? [],
+    shares,
+    payments: payments ?? [],
   });
 
-  approvedExpenses.forEach((e) => {
-    if (balances[e.payer_id]) {
-      balances[e.payer_id].paid += Number(e.amount);
-    }
-  });
-
-  shares.forEach((s) => {
-    // Only count shares for approved expenses
-    const expense = approvedExpenses.find((e) => e.id === s.expense_id);
-    if (expense && balances[s.user_id]) {
-      balances[s.user_id].share += Number(s.share);
-    }
-  });
-
-  payments?.forEach((p) => {
-    if (balances[p.from_user_id]) balances[p.from_user_id].sent += Number(p.amount);
-    if (balances[p.to_user_id]) balances[p.to_user_id].received += Number(p.amount);
-  });
-
-  const memberBalances = members?.map((m) => {
-    const b = balances[m.user_id] ?? { paid: 0, share: 0, received: 0, sent: 0 };
-    const balance = b.paid - b.share + b.received - b.sent;
+  const memberBalances = (members ?? []).map((m) => {
+    const b = balanceResults.find((r) => r.userId === m.user_id);
     return {
       ...m,
-      paid: b.paid,
-      share: b.share,
-      balance,
-      status: balance >= 0 ? ("طلبکار" as const) : ("بدهکار" as const),
+      paid: b?.totalPaid ?? 0,
+      share: b?.totalShare ?? 0,
+      balance: b?.balance ?? 0,
+      status: (b?.balance ?? 0) >= 0 ? ("طلبکار" as const) : ("بدهکار" as const),
     };
-  }) ?? [];
+  });
 
   const recentExpenses = (expenses ?? []).slice(0, 5);
 

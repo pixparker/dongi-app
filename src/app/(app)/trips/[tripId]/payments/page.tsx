@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { calculateMemberBalances, calculateSettlements } from "@/lib/calculations";
 
 export default async function PaymentsPage({
   params,
@@ -53,58 +54,15 @@ export default async function PaymentsPage({
     .eq("trip_id", tripId)
     .eq("is_deleted", false);
 
-  // Calculate balances
-  const balances: Record<string, number> = {};
-  members?.forEach((m) => {
-    balances[m.user_id] = 0;
+  // Calculate balances and settlements using shared logic
+  const memberBalances = calculateMemberBalances({
+    members: members ?? [],
+    expenses: expenses ?? [],
+    shares,
+    payments: payments ?? [],
   });
 
-  expenses?.forEach((e) => {
-    if (balances[e.payer_id] !== undefined) {
-      balances[e.payer_id] += Number(e.amount);
-    }
-  });
-
-  shares.forEach((s) => {
-    if (balances[s.user_id] !== undefined) {
-      balances[s.user_id] -= Number(s.share);
-    }
-  });
-
-  payments?.forEach((p) => {
-    if (balances[p.from_user_id] !== undefined) balances[p.from_user_id] -= Number(p.amount);
-    if (balances[p.to_user_id] !== undefined) balances[p.to_user_id] += Number(p.amount);
-  });
-
-  // Greedy settlement algorithm
-  const creditors: { userId: string; amount: number }[] = [];
-  const debtors: { userId: string; amount: number }[] = [];
-
-  Object.entries(balances).forEach(([userId, balance]) => {
-    if (balance > 0.01) creditors.push({ userId, amount: balance });
-    else if (balance < -0.01) debtors.push({ userId, amount: -balance });
-  });
-
-  creditors.sort((a, b) => b.amount - a.amount);
-  debtors.sort((a, b) => b.amount - a.amount);
-
-  const settlements: { from: string; to: string; amount: number }[] = [];
-  let ci = 0,
-    di = 0;
-  while (ci < creditors.length && di < debtors.length) {
-    const transfer = Math.min(creditors[ci].amount, debtors[di].amount);
-    if (transfer > 0.01) {
-      settlements.push({
-        from: debtors[di].userId,
-        to: creditors[ci].userId,
-        amount: Math.round(transfer * 100) / 100,
-      });
-    }
-    creditors[ci].amount -= transfer;
-    debtors[di].amount -= transfer;
-    if (creditors[ci].amount < 0.01) ci++;
-    if (debtors[di].amount < 0.01) di++;
-  }
+  const settlements = calculateSettlements(memberBalances);
 
   const memberMap = Object.fromEntries(
     members?.map((m) => [m.user_id, m.display_name]) ?? []
