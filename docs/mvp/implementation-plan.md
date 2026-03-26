@@ -38,7 +38,7 @@
 
 ## Phase 2: Authentication
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** Let users register, log in, log out, and protect all app routes behind auth.
 

@@ -1,10 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const PUBLIC_PATHS = ["/login", "/register"];
+
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  let supabaseResponse = NextResponse.next({ request });
 
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -13,7 +13,7 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -25,9 +25,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+          supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
@@ -35,6 +33,31 @@ export async function updateSession(request: NextRequest) {
       },
     }
   );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+
+  // Allow /invite/* without auth (page itself handles login redirect)
+  if (pathname.startsWith("/invite")) {
+    return supabaseResponse;
+  }
+
+  // Not logged in → redirect to login (except public paths)
+  if (!user && !PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // Logged in → redirect away from auth pages
+  if (user && PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/trips";
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }

@@ -1,10 +1,28 @@
 "use client";
 
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { login, type AuthResult } from "../actions";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "";
+  const [state, formAction, pending] = useActionState<AuthResult, FormData>(
+    (_prev, formData) => login(formData),
+    {}
+  );
+
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 direction-rtl">
       <div className="w-full max-w-sm text-center">
@@ -16,16 +34,36 @@ export default function LoginPage() {
           مدیریت هزینه سفرهای گروهی
         </p>
 
-        <InputField label="نام کاربری" placeholder="مثلاً: ali_traveler" icon="👤" />
-        <InputField label="رمز عبور" placeholder="••••••••" type="password" icon="🔒" />
+        <form action={formAction}>
+          <input type="hidden" name="redirect" value={redirectTo} />
+          <InputField
+            label="نام کاربری"
+            name="username"
+            placeholder="مثلاً: ali_traveler"
+            icon="👤"
+            required
+          />
+          <InputField
+            label="رمز عبور"
+            name="password"
+            placeholder="••••••••"
+            type="password"
+            icon="🔒"
+            required
+          />
 
-        <Button full size="lg" className="mt-2">
-          ورود
-        </Button>
+          {state.error && (
+            <p className="text-danger text-sm mb-3">{state.error}</p>
+          )}
+
+          <Button full size="lg" className="mt-2" disabled={pending}>
+            {pending ? "..." : "ورود"}
+          </Button>
+        </form>
 
         <div className="my-5 text-text-muted text-[13px]">─── یا ───</div>
 
-        <Link href="/register">
+        <Link href={`/register${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`}>
           <Button full variant="secondary" size="md">
             ساخت حساب جدید
           </Button>
