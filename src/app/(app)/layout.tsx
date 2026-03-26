@@ -1,8 +1,7 @@
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1">{children}</main>
-      {/* TODO: BottomNav component */}
+    <div className="min-h-screen flex flex-col bg-bg">
+      <main className="flex-1 flex flex-col">{children}</main>
     </div>
   );
 }

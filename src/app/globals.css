@@ -2,4 +2,43 @@
 
 @theme inline {
   --font-sans: var(--font-vazirmatn);
+
+  /* Colors from wireframe */
+  --color-bg: #0F1923;
+  --color-card: #1A2736;
+  --color-card-hover: #223344;
+  --color-accent: #00D68F;
+  --color-accent-soft: rgba(0, 214, 143, 0.12);
+  --color-danger: #FF6B6B;
+  --color-danger-soft: rgba(255, 107, 107, 0.12);
+  --color-warning: #FFB547;
+  --color-warning-soft: rgba(255, 181, 71, 0.12);
+  --color-text-primary: #E8EDF2;
+  --color-text-muted: #7A8FA6;
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-input-bg: #131E2A;
+  --color-info: #6B8AFF;
+  --color-pink: #FF8FCB;
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+/* Remove tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth transitions */
+input, button, a {
+  transition: all 0.15s ease;
 }
