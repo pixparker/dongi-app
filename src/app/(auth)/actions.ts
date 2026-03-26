@@ -63,10 +63,11 @@ export async function register(formData: FormData): Promise<AuthResult> {
   });
 
   if (error) {
+    console.error("[register] error:", error);
     if (error.message.includes("already registered")) {
       return { error: "این نام کاربری قبلاً ثبت شده است" };
     }
-    return { error: "خطا در ثبت‌نام. لطفاً دوباره تلاش کنید" };
+    return { error: `خطا در ثبت‌نام: ${error.message}` };
   }
 
   const redirectTo = formData.get("redirect") as string;

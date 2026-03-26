@@ -1,37 +1,121 @@
-"use client";
-
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { StatusPill } from "@/components/ui/status-pill";
 import { PageHeader } from "@/components/ui/page-header";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import Link from "next/link";
-import { use } from "react";
+import { createClient } from "@/lib/supabase/server";
+import { redirect, notFound } from "next/navigation";
 
-const MEMBERS = [
-  { name: "علی", paid: "۵,۲۰۰", share: "۳,۱۵۰", balance: "+۲,۰۵۰", status: "طلبکار" as const },
-  { name: "حسین", paid: "۲,۰۰۰", share: "۳,۱۵۰", balance: "-۱,۱۵۰", status: "بدهکار" as const },
-  { name: "مریم", paid: "۱,۴۰۰", share: "۳,۱۵۰", balance: "-۱,۷۵۰", status: "بدهکار" as const },
-  { name: "سارا", paid: "۳,۸۰۰", share: "۳,۱۵۰", balance: "+۶۵۰", status: "طلبکار" as const },
-];
+const CATEGORY_ICONS: Record<string, string> = {
+  food: "🍕",
+  transport: "⛽",
+  accommodation: "🏨",
+  entertainment: "🎭",
+  shopping: "🛍️",
+  other: "📦",
+};
 
-const EXPENSES = [
-  { title: "ناهار رستوران", amount: "۳,۲۰۰", payer: "علی", cat: "🍕", status: "approved" as const },
-  { title: "بنزین", amount: "۱,۸۰۰", payer: "سارا", cat: "⛽", status: "approved" as const },
-  { title: "هتل", amount: "۵,۴۰۰", payer: "حسین", cat: "🏨", status: "pending" as const },
-];
-
-export default function TripDashboardPage({
+export default async function TripDashboardPage({
   params,
 }: {
   params: Promise<{ tripId: string }>;
 }) {
-  const { tripId } = use(params);
+  const { tripId } = await params;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  // Fetch trip
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("*")
+    .eq("id", tripId)
+    .single();
+
+  if (!trip) notFound();
+
+  // Fetch members
+  const { data: members } = await supabase
+    .from("trip_members")
+    .select("*")
+    .eq("trip_id", tripId);
+
+  // Fetch approved, non-deleted expenses
+  const { data: expenses } = await supabase
+    .from("expenses")
+    .select("*")
+    .eq("trip_id", tripId)
+    .eq("is_deleted", false)
+    .order("created_at", { ascending: false });
+
+  // Fetch expense shares for these expenses
+  const expenseIds = expenses?.map((e) => e.id) ?? [];
+  let shares: { expense_id: string; user_id: string; share: number }[] = [];
+  if (expenseIds.length > 0) {
+    const { data } = await supabase
+      .from("expense_shares")
+      .select("expense_id, user_id, share")
+      .in("expense_id", expenseIds);
+    shares = data ?? [];
+  }
+
+  // Fetch non-deleted payments
+  const { data: payments } = await supabase
+    .from("payments")
+    .select("*")
+    .eq("trip_id", tripId)
+    .eq("is_deleted", false);
+
+  // Calculate balances
+  const approvedExpenses = expenses?.filter((e) => e.status === "approved") ?? [];
+  const totalExpenses = approvedExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
+  const memberCount = members?.length ?? 0;
+
+  const balances: Record<string, { paid: number; share: number; received: number; sent: number }> = {};
+  members?.forEach((m) => {
+    balances[m.user_id] = { paid: 0, share: 0, received: 0, sent: 0 };
+  });
+
+  approvedExpenses.forEach((e) => {
+    if (balances[e.payer_id]) {
+      balances[e.payer_id].paid += Number(e.amount);
+    }
+  });
+
+  shares.forEach((s) => {
+    // Only count shares for approved expenses
+    const expense = approvedExpenses.find((e) => e.id === s.expense_id);
+    if (expense && balances[s.user_id]) {
+      balances[s.user_id].share += Number(s.share);
+    }
+  });
+
+  payments?.forEach((p) => {
+    if (balances[p.from_user_id]) balances[p.from_user_id].sent += Number(p.amount);
+    if (balances[p.to_user_id]) balances[p.to_user_id].received += Number(p.amount);
+  });
+
+  const memberBalances = members?.map((m) => {
+    const b = balances[m.user_id] ?? { paid: 0, share: 0, received: 0, sent: 0 };
+    const balance = b.paid - b.share + b.received - b.sent;
+    return {
+      ...m,
+      paid: b.paid,
+      share: b.share,
+      balance,
+      status: balance >= 0 ? ("طلبکار" as const) : ("بدهکار" as const),
+    };
+  }) ?? [];
+
+  const recentExpenses = (expenses ?? []).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-bg flex flex-col direction-rtl">
       <PageHeader
-        title="سفر استانبول"
+        title={trip.name}
         backHref="/trips"
         rightAction={
           <Link
@@ -48,31 +132,33 @@ export default function TripDashboardPage({
         <div className="bg-accent/8 border border-accent/20 rounded-[18px] p-5 mb-4 text-center">
           <p className="text-xs text-text-muted mb-1 m-0">مجموع هزینه سفر</p>
           <p className="text-[32px] font-black text-accent tracking-tight m-0">
-            ۱۲,۶۰۰
+            {totalExpenses.toLocaleString()}
           </p>
-          <p className="text-[13px] text-text-muted m-0">₺ لیر ترکیه</p>
+          <p className="text-[13px] text-text-muted m-0">{trip.currency}</p>
           <div className="flex justify-center gap-4 mt-3.5 pt-3.5 border-t border-accent/15">
             <div>
               <p className="text-[11px] text-text-muted m-0">سهم هر نفر</p>
-              <p className="text-base font-bold text-text-primary m-0">۳,۱۵۰ ₺</p>
+              <p className="text-base font-bold text-text-primary m-0">
+                {memberCount > 0 ? Math.round(totalExpenses / memberCount).toLocaleString() : 0} {trip.currency}
+              </p>
             </div>
             <div className="w-px bg-accent/15" />
             <div>
               <p className="text-[11px] text-text-muted m-0">تعداد اعضا</p>
-              <p className="text-base font-bold text-text-primary m-0">۴ نفر</p>
+              <p className="text-base font-bold text-text-primary m-0">{memberCount} نفر</p>
             </div>
           </div>
         </div>
 
         {/* Members Balance */}
         <h3 className="text-sm font-bold text-text-primary mb-2.5 mt-0">وضعیت اعضا</h3>
-        {MEMBERS.map((m) => (
-          <Card key={m.name} className="mb-2 !p-3">
+        {memberBalances.map((m) => (
+          <Card key={m.id} className="mb-2 !p-3">
             <div className="flex items-center gap-3">
-              <Avatar name={m.name} size={38} />
+              <Avatar name={m.display_name} size={38} />
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-semibold text-text-primary">{m.name}</span>
+                  <span className="text-sm font-semibold text-text-primary">{m.display_name}</span>
                   <StatusPill
                     label={m.status}
                     color={m.status === "طلبکار" ? "var(--color-accent)" : "var(--color-danger)"}
@@ -80,13 +166,13 @@ export default function TripDashboardPage({
                   />
                 </div>
                 <div className="flex justify-between mt-1">
-                  <span className="text-[11px] text-text-muted">پرداخت: {m.paid} ₺</span>
+                  <span className="text-[11px] text-text-muted">پرداخت: {m.paid.toLocaleString()} {trip.currency}</span>
                   <span
                     className={`text-[13px] font-bold ${
                       m.status === "طلبکار" ? "text-accent" : "text-danger"
                     }`}
                   >
-                    {m.balance} ₺
+                    {m.balance >= 0 ? "+" : ""}{m.balance.toLocaleString()} {trip.currency}
                   </span>
                 </div>
               </div>
@@ -96,31 +182,41 @@ export default function TripDashboardPage({
 
         {/* Recent Expenses */}
         <h3 className="text-sm font-bold text-text-primary mt-4 mb-2.5">هزینه‌های اخیر</h3>
-        {EXPENSES.map((e) => (
-          <Card key={e.title} className="mb-2 !p-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-input-bg flex items-center justify-center text-xl shrink-0">
-                {e.cat}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-semibold text-text-primary">{e.title}</span>
-                  <span className="text-sm font-bold text-text-primary">{e.amount} ₺</span>
+        {recentExpenses.length === 0 && (
+          <p className="text-text-muted text-sm text-center py-4">هنوز هزینه‌ای ثبت نشده</p>
+        )}
+        {recentExpenses.map((e) => {
+          const payer = members?.find((m) => m.user_id === e.payer_id);
+          return (
+            <Card key={e.id} className="mb-2 !p-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-input-bg flex items-center justify-center text-xl shrink-0">
+                  {CATEGORY_ICONS[e.category] ?? "📦"}
                 </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-[11px] text-text-muted">پرداخت: {e.payer}</span>
-                  {e.status === "pending" && (
-                    <StatusPill
-                      label="در انتظار تایید"
-                      color="var(--color-warning)"
-                      bgColor="var(--color-warning-soft)"
-                    />
-                  )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-text-primary">{e.title}</span>
+                    <span className="text-sm font-bold text-text-primary">
+                      {Number(e.amount).toLocaleString()} {trip.currency}
+                    </span>
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-[11px] text-text-muted">
+                      پرداخت: {payer?.display_name ?? "نامشخص"}
+                    </span>
+                    {e.status === "pending" && (
+                      <StatusPill
+                        label="در انتظار تایید"
+                        color="var(--color-warning)"
+                        bgColor="var(--color-warning-soft)"
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
         <div className="h-4" />
       </div>
 

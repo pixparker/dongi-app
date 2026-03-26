@@ -63,7 +63,7 @@
 
 ## Phase 3: Trips CRUD
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** Users can create, view, update, and delete trips with real data instead of mock arrays.
 
