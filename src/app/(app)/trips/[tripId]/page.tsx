@@ -9,6 +9,7 @@ import { redirect, notFound } from "next/navigation";
 import { calculateMemberBalances } from "@/lib/calculations";
 import { currencySymbol } from "@/lib/constants";
 import { ExpenseApprovalButtons } from "./expenses/expense-actions";
+import { ExpensePieChart } from "@/components/charts/expense-pie-chart";
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: "🍕",
@@ -177,62 +178,12 @@ export default async function TripDashboardPage({
         ))}
 
         {/* Category Breakdown */}
-        {approvedExpenses.length > 0 && (() => {
-          const catTotals: Record<string, number> = {};
-          approvedExpenses.forEach((e) => {
-            catTotals[e.category] = (catTotals[e.category] || 0) + Number(e.amount);
-          });
-          const sorted = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
-          const CATEGORY_COLORS: Record<string, string> = {
-            food: "#00D68F", transport: "#6B8AFF", accommodation: "#FFB547",
-            entertainment: "#A78BFA", shopping: "#F472B6", other: "#64748B",
-          };
-          const CATEGORY_NAMES: Record<string, string> = {
-            food: "غذا", transport: "حمل‌ونقل", accommodation: "اقامت",
-            entertainment: "تفریح", shopping: "خرید", other: "سایر",
-          };
-          // Build conic gradient
-          let gradientParts: string[] = [];
-          let accPct = 0;
-          sorted.forEach(([cat, total]) => {
-            const pct = (total / totalExpenses) * 100;
-            const color = CATEGORY_COLORS[cat] ?? "#64748B";
-            gradientParts.push(`${color} ${accPct}% ${accPct + pct}%`);
-            accPct += pct;
-          });
-          const gradient = `conic-gradient(${gradientParts.join(", ")})`;
-
-          return (
-            <>
-              <h3 className="text-sm font-bold text-text-primary mt-4 mb-2.5">ترکیب هزینه‌ها</h3>
-              <div className="flex items-center gap-5 mb-4">
-                <div
-                  className="w-24 h-24 rounded-full shrink-0"
-                  style={{ background: gradient }}
-                />
-                <div className="flex-1 space-y-1.5">
-                  {sorted.map(([cat, total]) => {
-                    const pct = Math.round((total / totalExpenses) * 100);
-                    return (
-                      <div key={cat} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <div
-                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ background: CATEGORY_COLORS[cat] ?? "#64748B" }}
-                          />
-                          <span className="text-text-muted">{CATEGORY_NAMES[cat] ?? cat}</span>
-                        </div>
-                        <span className="text-text-primary font-semibold">
-                          {total.toLocaleString()} {currencySymbol(trip.currency)} ({pct}٪)
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          );
-        })()}
+        {approvedExpenses.length > 0 && (
+          <ExpensePieChart
+            expenses={approvedExpenses.map((e) => ({ category: e.category, amount: Number(e.amount) }))}
+            currency={trip.currency}
+          />
+        )}
 
         {/* Pending Expenses for Admin */}
         {isAdmin && pendingExpenses.length > 0 && (
