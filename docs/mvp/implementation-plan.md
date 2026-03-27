@@ -188,7 +188,27 @@
 
 ---
 
-## Phase 8: Approval Workflow & Polling Sync
+## Phase 8: Dashboard Expense Breakdown Chart
+
+**Status:** `Not Started`
+
+**Purpose:** Give users a visual breakdown of trip spending by category so they can quickly see where money goes.
+
+**Scope:**
+- Pie chart on trip dashboard (below recent expenses) showing expenses grouped by category
+- Each slice shows category name, amount, and percentage
+- Uses approved, non-deleted expenses only
+- Client component using a lightweight chart library (e.g. `recharts`)
+
+**Key files:**
+- Create: `src/components/charts/expense-pie-chart.tsx`
+- Modify: `src/app/(app)/trips/[tripId]/page.tsx` (add chart below expenses)
+
+**Verify:** Dashboard with 5+ expenses across different categories displays correct pie chart with matching amounts and percentages.
+
+---
+
+## Phase 9: Approval Workflow & Polling Sync
 
 **Status:** `Not Started`
 
@@ -216,7 +236,7 @@
 
 ---
 
-## Phase 9: Audit Logging
+## Phase 10: Audit Logging
 
 **Status:** `Not Started`
 
@@ -236,7 +256,7 @@
 
 ---
 
-## Phase 10: Deployment & E2E Verification
+## Phase 11: Deployment & E2E Verification
 
 **Status:** `Not Started`
 
