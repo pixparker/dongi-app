@@ -190,7 +190,7 @@
 
 ## Phase 8: Dashboard Expense Breakdown Chart
 
-**Status:** `Not Started`
+**Status:** `ٔNot Started`
 
 **Purpose:** Give users a visual breakdown of trip spending by category so they can quickly see where money goes.
 
@@ -210,7 +210,7 @@
 
 ## Phase 9: Approval Workflow & Polling Sync
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** Admins can gate member-submitted expenses, and all users see live updates without manual refresh.
 
@@ -238,7 +238,7 @@
 
 ## Phase 10: Audit Logging
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** Record every create/update/delete so the team has a transparent change history.
 
