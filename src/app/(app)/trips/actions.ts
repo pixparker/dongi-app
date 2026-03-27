@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { logAudit } from "@/lib/audit";
 
 export type TripActionResult = {
   error?: string;
@@ -65,6 +66,8 @@ export async function createTrip(formData: FormData): Promise<TripActionResult> 
     console.error("[createTrip] member insert error:", memberError);
     return { error: `خطا در افزودن عضو: ${memberError.message}` };
   }
+
+  await logAudit(trip.id, "trip", trip.id, "create", user.id, null, { name, currency });
 
   redirect(`/trips/${trip.id}/share`);
 }

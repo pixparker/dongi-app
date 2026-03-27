@@ -112,6 +112,8 @@ export async function createExpense(
     return { error: `خطا در ثبت سهم‌ها: ${sharesError.message}` };
   }
 
+  await logAudit(tripId, "expense", expense.id, "create", user.id, null, { title, amount, status });
+
   redirect(`/trips/${tripId}`);
 }
 
@@ -134,6 +136,8 @@ export async function deleteExpense(
     console.error("[deleteExpense] error:", error);
     return { error: `خطا: ${error.message}` };
   }
+
+  await logAudit(tripId, "expense", expenseId, "delete", user.id, { id: expenseId }, null);
 
   redirect(`/trips/${tripId}`);
 }

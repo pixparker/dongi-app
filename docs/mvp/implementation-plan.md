@@ -190,7 +190,7 @@
 
 ## Phase 8: Dashboard Expense Breakdown Chart
 
-**Status:** `ٔNot Started`
+**Status:** `Done`
 
 **Purpose:** Give users a visual breakdown of trip spending by category so they can quickly see where money goes.
 
@@ -258,7 +258,7 @@
 
 ## Phase 11: Deployment & E2E Verification
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** Ship to production and verify the full user journey works end-to-end.
 

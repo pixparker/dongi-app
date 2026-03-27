@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { toLatinNumber } from "@/lib/utils";
+import { logAudit } from "@/lib/audit";
 
 export type PaymentActionResult = {
   error?: string;
@@ -27,18 +28,24 @@ export async function createPayment(
   if (fromUserId === toUserId) return { error: "پرداخت‌کننده و دریافت‌کننده نمی‌توانند یکی باشند" };
   if (!amount || amount <= 0) return { error: "مبلغ باید بزرگتر از صفر باشد" };
 
-  const { error } = await supabase.from("payments").insert({
+  const { data: payment, error } = await supabase.from("payments").insert({
     trip_id: tripId,
     from_user_id: fromUserId,
     to_user_id: toUserId,
     amount,
     date,
-  });
+  }).select("id").single();
 
   if (error) {
     console.error("[createPayment] error:", error);
     return { error: `خطا در ثبت پرداخت: ${error.message}` };
   }
+
+  await logAudit(tripId, "payment", payment.id, "create", user.id, null, {
+    from_user_id: fromUserId,
+    to_user_id: toUserId,
+    amount,
+  });
 
   redirect(`/trips/${tripId}`);
 }
@@ -62,6 +69,8 @@ export async function deletePayment(
     console.error("[deletePayment] error:", error);
     return { error: `خطا: ${error.message}` };
   }
+
+  await logAudit(tripId, "payment", paymentId, "delete", user.id, { id: paymentId }, null);
 
   redirect(`/trips/${tripId}`);
 }

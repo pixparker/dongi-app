@@ -25,9 +25,16 @@ function formatLogDetail(log: {
 }): string {
   const entity = ENTITY_LABELS[log.entity_type] ?? log.entity_type;
 
-  if (log.entity_type === "trip_member" && log.action === "create") {
-    const name = (log.after?.display_name as string) ?? "کاربر";
-    return `${name} به سفر پیوست`;
+  if (log.entity_type === "trip" && log.action === "create") {
+    const name = (log.after?.name as string) ?? "سفر";
+    return `سفر «${name}» ساخته شد`;
+  }
+
+  if (log.entity_type === "trip_member") {
+    const name = (log.after?.display_name as string) ?? (log.before?.display_name as string) ?? "کاربر";
+    if (log.action === "create") return `${name} به سفر پیوست`;
+    if (log.action === "update" && log.after?.role === "admin") return `${name} به ادمین ارتقا یافت`;
+    if (log.action === "delete") return `${name} از سفر حذف شد`;
   }
 
   if (log.entity_type === "expense") {
@@ -43,7 +50,8 @@ function formatLogDetail(log: {
   }
 
   if (log.entity_type === "payment") {
-    if (log.action === "create") return `پرداخت جدید ثبت شد`;
+    const amount = log.after?.amount as number;
+    if (log.action === "create") return `پرداخت${amount ? ` ${amount.toLocaleString()}` : ""} ثبت شد`;
     if (log.action === "delete") return `پرداخت حذف شد`;
   }
 
