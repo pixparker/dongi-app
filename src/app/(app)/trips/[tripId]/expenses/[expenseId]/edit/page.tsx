@@ -5,6 +5,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { PageHeader } from "@/components/ui/page-header";
+import { Skeleton } from "@/components/ui/skeleton";
 import { createClient } from "@/lib/supabase/client";
 import { toLatinNumber } from "@/lib/utils";
 import { currencySymbol } from "@/lib/constants";
@@ -12,8 +13,8 @@ import { updateExpense, type ExpenseActionResult } from "../../actions";
 
 const SPLIT_MODES = [
   { id: "equal", label: "مساوی" },
-  { id: "percentage", label: "درصدی" },
   { id: "fixed", label: "مبلغ ثابت" },
+  { id: "percentage", label: "درصدی" },
 ];
 
 const CATEGORIES = [
@@ -126,7 +127,18 @@ export default function EditExpensePage({
     return (
       <div className="min-h-screen bg-bg direction-rtl">
         <PageHeader title="ویرایش هزینه" backHref={`/trips/${tripId}/expenses`} />
-        <div className="px-5 py-8 text-center text-text-muted">...</div>
+        <div className="px-5 pb-6 space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-24" />
+            <Skeleton className="h-10 w-24" />
+            <Skeleton className="h-10 w-24" />
+          </div>
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
       </div>
     );
   }
@@ -150,7 +162,7 @@ export default function EditExpensePage({
               className="w-full bg-input-bg border border-border rounded-[18px] py-5 px-4 text-center text-[32px] font-black text-text-primary outline-none"
             />
             {currency && (
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-text-muted">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-4xl text-text-muted/40">
                 {currencySymbol(currency)}
               </span>
             )}

@@ -12,8 +12,8 @@ import { createExpense, type ExpenseActionResult } from "../actions";
 
 const SPLIT_MODES = [
   { id: "equal", label: "مساوی" },
-  { id: "percentage", label: "درصدی" },
   { id: "fixed", label: "مبلغ ثابت" },
+  { id: "percentage", label: "درصدی" },
 ];
 
 const CATEGORIES = [
@@ -123,7 +123,7 @@ export default function NewExpensePage({
                 className="w-full bg-input-bg border border-border rounded-[18px] py-5 px-4 text-center text-[32px] font-black text-text-primary outline-none placeholder:text-text-muted"
               />
               {currency && (
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-text-muted">{currencySymbol(currency)}</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-4xl text-text-muted/40">{currencySymbol(currency)}</span>
               )}
             </div>
           </div>
@@ -197,21 +197,19 @@ export default function NewExpensePage({
                     )}
                     {splitMode === "percentage" && isSelected && (
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         name={`share_${m.user_id}`}
                         placeholder="٪"
-                        min="0"
-                        max="100"
                         className="w-16 bg-input-bg border border-border rounded-lg px-2 py-1 text-center text-sm text-text-primary outline-none"
                       />
                     )}
                     {splitMode === "fixed" && isSelected && (
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         name={`share_${m.user_id}`}
                         placeholder="مبلغ"
-                        min="0"
-                        step="0.01"
                         className="w-20 bg-input-bg border border-border rounded-lg px-2 py-1 text-center text-sm text-text-primary outline-none"
                       />
                     )}

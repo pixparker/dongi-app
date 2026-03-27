@@ -10,6 +10,7 @@ import { calculateMemberBalances } from "@/lib/calculations";
 import { currencySymbol } from "@/lib/constants";
 import { ExpenseApprovalButtons } from "./expenses/expense-actions";
 import { ExpensePieChart } from "@/components/charts/expense-pie-chart";
+import { ExpenseAccordion } from "@/components/expenses/expense-accordion";
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: "🍕",
@@ -225,46 +226,14 @@ export default async function TripDashboardPage({
         {recentExpenses.length === 0 && (
           <p className="text-text-muted text-sm text-center py-4">هنوز هزینه‌ای ثبت نشده</p>
         )}
-        {recentExpenses.map((e) => {
-          const payer = members?.find((m) => m.user_id === e.payer_id);
-          const isRejected = e.status === "rejected";
-          return (
-            <Card key={e.id} className={`mb-2 !p-3 ${isRejected ? "opacity-50" : ""}`}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-input-bg flex items-center justify-center text-xl shrink-0">
-                  {CATEGORY_ICONS[e.category] ?? "📦"}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center">
-                    <span className={`text-sm font-semibold ${isRejected ? "text-text-muted line-through" : "text-text-primary"}`}>{e.title}</span>
-                    <span className={`text-sm font-bold ${isRejected ? "text-text-muted" : "text-text-primary"}`}>
-                      {Number(e.amount).toLocaleString()} {currencySymbol(trip.currency)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-[11px] text-text-muted">
-                      پرداخت: {payer?.display_name ?? "نامشخص"}
-                    </span>
-                    {e.status === "pending" && (
-                      <StatusPill
-                        label="در انتظار تایید"
-                        color="var(--color-warning)"
-                        bgColor="var(--color-warning-soft)"
-                      />
-                    )}
-                    {isRejected && (
-                      <StatusPill
-                        label="رد شده"
-                        color="var(--color-danger)"
-                        bgColor="var(--color-danger-soft)"
-                      />
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
+        <ExpenseAccordion
+          expenses={recentExpenses.map((e) => ({ ...e, amount: Number(e.amount) }))}
+          shares={shares}
+          members={members?.map((m) => ({ user_id: m.user_id, display_name: m.display_name })) ?? []}
+          currency={currencySymbol(trip.currency)}
+          tripId={tripId}
+          isAdmin={isAdmin}
+        />
         <div className="h-4" />
       </div>
 
