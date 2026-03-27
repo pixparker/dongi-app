@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { calculateMemberBalances } from "@/lib/calculations";
 import { currencySymbol } from "@/lib/constants";
+import { ExpenseApprovalButtons } from "./expenses/expense-actions";
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: "🍕",
@@ -94,6 +95,9 @@ export default async function TripDashboardPage({
     };
   });
 
+  const currentMember = members?.find((m) => m.user_id === user.id);
+  const isAdmin = currentMember?.role === "creator" || currentMember?.role === "admin";
+  const pendingExpenses = (expenses ?? []).filter((e) => e.status === "pending");
   const recentExpenses = (expenses ?? []).slice(0, 5);
 
   return (
@@ -102,12 +106,20 @@ export default async function TripDashboardPage({
         title={trip.name}
         backHref="/trips"
         rightAction={
-          <Link
-            href={`/trips/${tripId}/members`}
-            className="text-accent text-sm font-semibold no-underline"
-          >
-            👥 اعضا
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/trips/${tripId}/settings`}
+              className="text-text-muted text-lg no-underline"
+            >
+              ⚙️
+            </Link>
+            <Link
+              href={`/trips/${tripId}/members`}
+              className="text-accent text-sm font-semibold no-underline"
+            >
+              👥 اعضا
+            </Link>
+          </div>
         }
       />
 
@@ -164,7 +176,100 @@ export default async function TripDashboardPage({
           </Card>
         ))}
 
-        {/* Recent Expenses */}
+        {/* Category Breakdown */}
+        {approvedExpenses.length > 0 && (() => {
+          const catTotals: Record<string, number> = {};
+          approvedExpenses.forEach((e) => {
+            catTotals[e.category] = (catTotals[e.category] || 0) + Number(e.amount);
+          });
+          const sorted = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+          const CATEGORY_COLORS: Record<string, string> = {
+            food: "#00D68F", transport: "#6B8AFF", accommodation: "#FFB547",
+            entertainment: "#A78BFA", shopping: "#F472B6", other: "#64748B",
+          };
+          const CATEGORY_NAMES: Record<string, string> = {
+            food: "غذا", transport: "حمل‌ونقل", accommodation: "اقامت",
+            entertainment: "تفریح", shopping: "خرید", other: "سایر",
+          };
+          // Build conic gradient
+          let gradientParts: string[] = [];
+          let accPct = 0;
+          sorted.forEach(([cat, total]) => {
+            const pct = (total / totalExpenses) * 100;
+            const color = CATEGORY_COLORS[cat] ?? "#64748B";
+            gradientParts.push(`${color} ${accPct}% ${accPct + pct}%`);
+            accPct += pct;
+          });
+          const gradient = `conic-gradient(${gradientParts.join(", ")})`;
+
+          return (
+            <>
+              <h3 className="text-sm font-bold text-text-primary mt-4 mb-2.5">ترکیب هزینه‌ها</h3>
+              <div className="flex items-center gap-5 mb-4">
+                <div
+                  className="w-24 h-24 rounded-full shrink-0"
+                  style={{ background: gradient }}
+                />
+                <div className="flex-1 space-y-1.5">
+                  {sorted.map(([cat, total]) => {
+                    const pct = Math.round((total / totalExpenses) * 100);
+                    return (
+                      <div key={cat} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <div
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ background: CATEGORY_COLORS[cat] ?? "#64748B" }}
+                          />
+                          <span className="text-text-muted">{CATEGORY_NAMES[cat] ?? cat}</span>
+                        </div>
+                        <span className="text-text-primary font-semibold">
+                          {total.toLocaleString()} {currencySymbol(trip.currency)} ({pct}٪)
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          );
+        })()}
+
+        {/* Pending Expenses for Admin */}
+        {isAdmin && pendingExpenses.length > 0 && (
+          <>
+            <div className="flex items-center gap-2 mt-4 mb-2.5">
+              <h3 className="text-sm font-bold text-text-primary m-0">در انتظار تایید</h3>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--color-warning-soft)", color: "var(--color-warning)" }}>
+                {pendingExpenses.length}
+              </span>
+            </div>
+            {pendingExpenses.map((e) => {
+              const payer = members?.find((m) => m.user_id === e.payer_id);
+              return (
+                <Card key={e.id} className="mb-2 !p-3 border-warning/30">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-input-bg flex items-center justify-center text-xl shrink-0">
+                      {CATEGORY_ICONS[e.category] ?? "📦"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-text-primary">{e.title}</span>
+                        <span className="text-sm font-bold text-text-primary">
+                          {Number(e.amount).toLocaleString()} {currencySymbol(trip.currency)}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-text-muted">
+                        پرداخت: {payer?.display_name ?? "نامشخص"}
+                      </span>
+                    </div>
+                  </div>
+                  <ExpenseApprovalButtons tripId={tripId} expenseId={e.id} />
+                </Card>
+              );
+            })}
+          </>
+        )}
+
         <h3 className="text-sm font-bold text-text-primary mt-4 mb-2.5">هزینه‌های اخیر</h3>
         {recentExpenses.length === 0 && (
           <p className="text-text-muted text-sm text-center py-4">هنوز هزینه‌ای ثبت نشده</p>

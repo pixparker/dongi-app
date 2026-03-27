@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { logAudit } from "@/lib/audit";
 
 export async function joinTrip(inviteCode: string) {
   const supabase = await createClient();
@@ -55,6 +56,12 @@ export async function joinTrip(inviteCode: string) {
     console.error("[joinTrip] error:", error);
     return { error: `خطا در پیوستن: ${error.message}` };
   }
+
+  const displayName = profile?.display_name ?? profile?.username ?? "کاربر";
+  await logAudit(trip.id, "trip_member", user.id, "create", user.id, null, {
+    display_name: displayName,
+    role: "member",
+  });
 
   redirect(`/trips/${trip.id}`);
 }

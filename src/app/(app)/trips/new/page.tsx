@@ -5,10 +5,12 @@ import { useActionState } from "react";
 import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
+import { CurrencySelect } from "@/components/ui/currency-select";
 import { createTrip, type TripActionResult } from "../actions";
 
 export default function NewTripPage() {
   const today = new Date().toISOString().split("T")[0];
+  const [currency, setCurrency] = useState("TRY");
   const [requireApproval, setRequireApproval] = useState(false);
   const [state, formAction, pending] = useActionState<TripActionResult, FormData>(
     (_prev, formData) => createTrip(formData),
@@ -28,7 +30,10 @@ export default function NewTripPage() {
           </div>
 
           <InputField label="نام سفر" name="name" placeholder="مثلاً: سفر شمال ۱۴۰۵" icon="✏️" required />
-          <InputField label="واحد پول" name="currency" placeholder="TRY" defaultValue="TRY" icon="💱" />
+
+          <input type="hidden" name="currency" value={currency} />
+          <CurrencySelect value={currency} onChange={setCurrency} />
+
           <InputField label="تاریخ شروع" name="start_date" type="date" defaultValue={today} icon="📅" />
 
           {/* Approval Toggle */}

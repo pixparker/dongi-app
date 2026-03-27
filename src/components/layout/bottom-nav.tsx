@@ -15,7 +15,7 @@ export function BottomNav({ tripId }: { tripId: string }) {
 
   const items: NavItem[] = [
     { id: "dashboard", icon: "📊", label: "داشبورد", href: `/trips/${tripId}` },
-    { id: "addExpense", icon: "💸", label: "هزینه", href: `/trips/${tripId}/expenses/new` },
+    { id: "addExpense", icon: "+", label: "هزینه", href: `/trips/${tripId}/expenses/new` },
     { id: "settlement", icon: "💰", label: "تسویه", href: `/trips/${tripId}/payments` },
     { id: "history", icon: "📋", label: "تاریخچه", href: `/trips/${tripId}/history` },
   ];
@@ -37,7 +37,11 @@ export function BottomNav({ tripId }: { tripId: string }) {
               active ? "bg-accent-soft" : ""
             }`}
           >
-            <span className="text-xl">{item.icon}</span>
+            {item.id === "addExpense" ? (
+              <span className="w-8 h-8 rounded-full bg-accent text-bg flex items-center justify-center text-xl font-bold leading-none">+</span>
+            ) : (
+              <span className="text-xl">{item.icon}</span>
+            )}
             <span
               className={`text-[10px] ${
                 active ? "font-bold text-accent" : "font-medium text-text-muted"

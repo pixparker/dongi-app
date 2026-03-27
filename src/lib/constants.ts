@@ -17,16 +17,20 @@ export const EXPENSE_CATEGORIES = [
 ] as const;
 export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
 
-export const CURRENCY_SYMBOLS: Record<string, string> = {
-  TRY: "₺",
-  IRR: "﷼",
-  IRT: "تومان",
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  AED: "د.إ",
-};
+export const CURRENCIES = [
+  { code: "TRY", symbol: "₺", name: "لیر ترکیه" },
+  { code: "IRT", symbol: "تومان", name: "تومان ایران" },
+  { code: "USD", symbol: "$", name: "دلار آمریکا" },
+  { code: "EUR", symbol: "€", name: "یورو" },
+  { code: "GBP", symbol: "£", name: "پوند انگلیس" },
+  { code: "AED", symbol: "د.إ", name: "درهم امارات" },
+] as const;
 
 export function currencySymbol(code: string): string {
-  return CURRENCY_SYMBOLS[code.toUpperCase()] ?? code;
+  return CURRENCIES.find((c) => c.code === code.toUpperCase())?.symbol ?? code;
+}
+
+export function currencyLabel(code: string): string {
+  const c = CURRENCIES.find((c) => c.code === code.toUpperCase());
+  return c ? `${c.symbol} ${c.name}` : code;
 }

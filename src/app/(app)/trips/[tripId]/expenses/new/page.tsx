@@ -41,6 +41,7 @@ export default function NewExpensePage({
   const [members, setMembers] = useState<Member[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currency, setCurrency] = useState("");
+  const [needsApproval, setNeedsApproval] = useState(false);
   const [splitMode, setSplitMode] = useState("equal");
   const [selectedPayer, setSelectedPayer] = useState<string>("");
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
@@ -62,22 +63,26 @@ export default function NewExpensePage({
 
       const { data: tripData } = await supabase
         .from("trips")
-        .select("currency")
+        .select("currency, require_approval")
         .eq("id", tripId)
         .single();
       if (tripData) setCurrency(tripData.currency);
 
       const { data } = await supabase
         .from("trip_members")
-        .select("id, user_id, display_name")
+        .select("id, user_id, display_name, role")
         .eq("trip_id", tripId);
 
       if (data) {
         setMembers(data);
         setSelectedParticipants(data.map((m) => m.user_id));
-        // Default payer to current user
         if (user) {
           setSelectedPayer(user.id);
+          // Check if this user's expenses need approval
+          const myRole = data.find((m) => m.user_id === user.id)?.role;
+          if (tripData?.require_approval && myRole === "member") {
+            setNeedsApproval(true);
+          }
         }
       }
     }
@@ -253,6 +258,15 @@ export default function NewExpensePage({
 
           <input type="hidden" name="date" value={today} />
           <InputField label="توضیحات (اختیاری)" name="description" placeholder="مثلاً: شام در بازار بزرگ" icon="📝" />
+
+          {needsApproval && (
+            <div className="bg-input-bg border border-border rounded-xl px-4 py-3 mb-4 flex items-start gap-2.5">
+              <span className="text-lg leading-none mt-0.5">ℹ️</span>
+              <p className="text-xs text-text-muted m-0">
+                هزینه‌های شما پس از تایید ادمین سفر در محاسبات لحاظ می‌شود.
+              </p>
+            </div>
+          )}
 
           {state.error && (
             <p className="text-danger text-sm mb-3">{state.error}</p>

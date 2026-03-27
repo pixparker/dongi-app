@@ -66,7 +66,7 @@ export async function createTrip(formData: FormData): Promise<TripActionResult> 
     return { error: `خطا در افزودن عضو: ${memberError.message}` };
   }
 
-  redirect(`/trips/${trip.id}`);
+  redirect(`/trips/${trip.id}/share`);
 }
 
 export async function updateTrip(
@@ -81,6 +81,7 @@ export async function updateTrip(
 
   const name = (formData.get("name") as string)?.trim();
   const currency = (formData.get("currency") as string)?.trim();
+  const requireApproval = formData.get("require_approval") === "true";
 
   if (!name) {
     return { error: "نام سفر الزامی است" };
@@ -88,7 +89,7 @@ export async function updateTrip(
 
   const { error } = await supabase
     .from("trips")
-    .update({ name, currency })
+    .update({ name, currency, require_approval: requireApproval })
     .eq("id", tripId);
 
   if (error) {
