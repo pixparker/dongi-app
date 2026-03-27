@@ -276,16 +276,17 @@ export default async function TripDashboardPage({
         )}
         {recentExpenses.map((e) => {
           const payer = members?.find((m) => m.user_id === e.payer_id);
+          const isRejected = e.status === "rejected";
           return (
-            <Card key={e.id} className="mb-2 !p-3">
+            <Card key={e.id} className={`mb-2 !p-3 ${isRejected ? "opacity-50" : ""}`}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-input-bg flex items-center justify-center text-xl shrink-0">
                   {CATEGORY_ICONS[e.category] ?? "📦"}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold text-text-primary">{e.title}</span>
-                    <span className="text-sm font-bold text-text-primary">
+                    <span className={`text-sm font-semibold ${isRejected ? "text-text-muted line-through" : "text-text-primary"}`}>{e.title}</span>
+                    <span className={`text-sm font-bold ${isRejected ? "text-text-muted" : "text-text-primary"}`}>
                       {Number(e.amount).toLocaleString()} {currencySymbol(trip.currency)}
                     </span>
                   </div>
@@ -298,6 +299,13 @@ export default async function TripDashboardPage({
                         label="در انتظار تایید"
                         color="var(--color-warning)"
                         bgColor="var(--color-warning-soft)"
+                      />
+                    )}
+                    {isRejected && (
+                      <StatusPill
+                        label="رد شده"
+                        color="var(--color-danger)"
+                        bgColor="var(--color-danger-soft)"
                       />
                     )}
                   </div>

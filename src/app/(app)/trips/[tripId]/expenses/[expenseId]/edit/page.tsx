@@ -150,7 +150,7 @@ export default function EditExpensePage({
               className="w-full bg-input-bg border border-border rounded-[18px] py-5 px-4 text-center text-[32px] font-black text-text-primary outline-none"
             />
             {currency && (
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-muted">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-text-muted">
                 {currencySymbol(currency)}
               </span>
             )}

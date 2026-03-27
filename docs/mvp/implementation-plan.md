@@ -164,7 +164,31 @@
 
 ---
 
-## Phase 7: Approval Workflow & Polling Sync
+## Phase 7: UX & Performance — Skeleton Loading & Router Caching
+
+**Status:** `Done`
+
+**Purpose:** Eliminate loading flickers and unnecessary Supabase fetches on navigation by adding skeleton loading states to all main routes. With `loading.tsx` files, Next.js 16 caches rendered pages in the client-side Router Cache (30s TTL), making back-navigation instant.
+
+**Scope:**
+- Reusable `Skeleton` component (`animate-pulse` placeholder)
+- `loading.tsx` for trips list, trip dashboard, expenses, payments, members
+- Each skeleton matches the real page layout (cards, headers, avatars)
+- No changes to existing files — purely additive
+
+**Key files:**
+- Create: `src/components/ui/skeleton.tsx`
+- Create: `src/app/(app)/trips/loading.tsx`
+- Create: `src/app/(app)/trips/[tripId]/loading.tsx`
+- Create: `src/app/(app)/trips/[tripId]/expenses/loading.tsx`
+- Create: `src/app/(app)/trips/[tripId]/payments/loading.tsx`
+- Create: `src/app/(app)/trips/[tripId]/members/loading.tsx`
+
+**Verify:** Navigate between routes — skeleton shows instantly (no blank screen). Click "ثبت هزینه جدید" then press back — dashboard appears from cache (no re-fetch within 30s). Create an expense — after redirect, fresh data appears.
+
+---
+
+## Phase 8: Approval Workflow & Polling Sync
 
 **Status:** `Not Started`
 
@@ -192,7 +216,7 @@
 
 ---
 
-## Phase 8: Audit Logging
+## Phase 9: Audit Logging
 
 **Status:** `Not Started`
 
@@ -212,7 +236,7 @@
 
 ---
 
-## Phase 9: Deployment & E2E Verification
+## Phase 10: Deployment & E2E Verification
 
 **Status:** `Not Started`
 

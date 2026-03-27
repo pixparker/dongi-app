@@ -123,7 +123,7 @@ export default function NewExpensePage({
                 className="w-full bg-input-bg border border-border rounded-[18px] py-5 px-4 text-center text-[32px] font-black text-text-primary outline-none placeholder:text-text-muted"
               />
               {currency && (
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-muted">{currencySymbol(currency)}</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-text-muted">{currencySymbol(currency)}</span>
               )}
             </div>
           </div>

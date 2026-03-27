@@ -31,6 +31,7 @@ export default async function TripsPage() {
     currency: string;
     created_at: string;
     memberCount: number;
+    totalExpense: number;
   }[] = [];
 
   if (tripIds.length > 0) {
@@ -52,9 +53,23 @@ export default async function TripsPage() {
         countMap[m.trip_id] = (countMap[m.trip_id] || 0) + 1;
       });
 
+      // Get expense totals (approved only)
+      const { data: allExpenses } = await supabase
+        .from("expenses")
+        .select("trip_id, amount")
+        .in("trip_id", tripIds)
+        .eq("is_deleted", false)
+        .eq("status", "approved");
+
+      const totalMap: Record<string, number> = {};
+      allExpenses?.forEach((e) => {
+        totalMap[e.trip_id] = (totalMap[e.trip_id] || 0) + Number(e.amount);
+      });
+
       trips = tripsData.map((t) => ({
         ...t,
         memberCount: countMap[t.id] || 0,
+        totalExpense: totalMap[t.id] || 0,
       }));
     }
   }
@@ -96,7 +111,7 @@ export default async function TripsPage() {
                       👥 {trip.memberCount} نفر
                     </span>
                     <span className="text-xs text-text-muted">
-                      💰 {currencySymbol(trip.currency)}
+                      💰 {trip.totalExpense > 0 ? `${trip.totalExpense.toLocaleString()} ${currencySymbol(trip.currency)}` : currencySymbol(trip.currency)}
                     </span>
                   </div>
                 </div>
