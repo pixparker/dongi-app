@@ -6,6 +6,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 const PERSIAN_DIGITS = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+const ARABIC_DIGITS = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+
+export function toLatinNumber(s: string): string {
+  let result = s;
+  PERSIAN_DIGITS.forEach((d, i) => {
+    result = result.replaceAll(d, String(i));
+  });
+  ARABIC_DIGITS.forEach((d, i) => {
+    result = result.replaceAll(d, String(i));
+  });
+  return result;
+}
 
 export function toPersianNumber(n: number | string): string {
   return String(n).replace(/\d/g, (d) => PERSIAN_DIGITS[parseInt(d)]);

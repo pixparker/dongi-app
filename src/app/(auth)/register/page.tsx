@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useActionState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,31 @@ export default function RegisterPage() {
 function RegisterForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "";
-  const [state, formAction, pending] = useActionState<AuthResult, FormData>(
-    (_prev, formData) => register(formData),
-    {}
-  );
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.set("display_name", displayName);
+    formData.set("username", username);
+    formData.set("password", password);
+    formData.set("confirmPassword", confirmPassword);
+    formData.set("redirect", redirectTo);
+
+    const result: AuthResult = await register(formData);
+    if (result?.error) {
+      setError(result.error);
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 direction-rtl">
@@ -34,13 +55,23 @@ function RegisterForm() {
           به دنگی‌سفر خوش آمدید
         </p>
 
-        <form action={formAction}>
-          <input type="hidden" name="redirect" value={redirectTo} />
+        <form onSubmit={handleSubmit}>
           <InputField
-            label="نام کاربری"
+            label="نام نمایشی"
+            name="display_name"
+            placeholder="مثلاً: علی، حسین، مریم"
+            icon="😊"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            required
+          />
+          <InputField
+            label="نام کاربری (برای ورود)"
             name="username"
             placeholder="یک نام کاربری انتخاب کنید"
             icon="👤"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
             minLength={3}
           />
@@ -50,6 +81,8 @@ function RegisterForm() {
             placeholder="••••••••"
             type="password"
             icon="🔒"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
           />
@@ -59,15 +92,17 @@ function RegisterForm() {
             placeholder="••••••••"
             type="password"
             icon="🔒"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
 
-          {state.error && (
-            <p className="text-danger text-sm mb-3">{state.error}</p>
+          {error && (
+            <p className="text-danger text-sm mb-3">{error}</p>
           )}
 
-          <Button full size="lg" className="mt-2" disabled={pending}>
-            {pending ? "..." : "ثبت‌نام"}
+          <Button full size="lg" className="mt-2" disabled={loading}>
+            {loading ? "..." : "ثبت‌نام"}
           </Button>
         </form>
 

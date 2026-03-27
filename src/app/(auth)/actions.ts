@@ -32,12 +32,13 @@ export async function login(formData: FormData): Promise<AuthResult> {
 export async function register(formData: FormData): Promise<AuthResult> {
   const supabase = await createClient();
 
+  const displayName = (formData.get("display_name") as string)?.trim();
   const username = (formData.get("username") as string)?.trim();
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
-  if (!username || !password) {
-    return { error: "نام کاربری و رمز عبور الزامی است" };
+  if (!displayName || !username || !password) {
+    return { error: "نام نمایشی، نام کاربری و رمز عبور الزامی است" };
   }
 
   if (username.length < 3) {
@@ -58,7 +59,7 @@ export async function register(formData: FormData): Promise<AuthResult> {
     email,
     password,
     options: {
-      data: { username },
+      data: { username, display_name: displayName },
     },
   });
 

@@ -143,7 +143,7 @@
 
 ## Phase 6: Invite System
 
-**Status:** `Not Started`
+**Status:** `Done`
 
 **Purpose:** Let trip creators share a link so others can join a trip.
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useActionState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,27 @@ export default function LoginPage() {
 function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "";
-  const [state, formAction, pending] = useActionState<AuthResult, FormData>(
-    (_prev, formData) => login(formData),
-    {}
-  );
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.set("username", username);
+    formData.set("password", password);
+    formData.set("redirect", redirectTo);
+
+    const result: AuthResult = await login(formData);
+    if (result?.error) {
+      setError(result.error);
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 direction-rtl">
@@ -34,13 +51,14 @@ function LoginForm() {
           مدیریت هزینه سفرهای گروهی
         </p>
 
-        <form action={formAction}>
-          <input type="hidden" name="redirect" value={redirectTo} />
+        <form onSubmit={handleSubmit}>
           <InputField
             label="نام کاربری"
             name="username"
             placeholder="مثلاً: ali_traveler"
             icon="👤"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
           <InputField
@@ -49,15 +67,17 @@ function LoginForm() {
             placeholder="••••••••"
             type="password"
             icon="🔒"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
 
-          {state.error && (
-            <p className="text-danger text-sm mb-3">{state.error}</p>
+          {error && (
+            <p className="text-danger text-sm mb-3">{error}</p>
           )}
 
-          <Button full size="lg" className="mt-2" disabled={pending}>
-            {pending ? "..." : "ورود"}
+          <Button full size="lg" className="mt-2" disabled={loading}>
+            {loading ? "..." : "ورود"}
           </Button>
         </form>
 

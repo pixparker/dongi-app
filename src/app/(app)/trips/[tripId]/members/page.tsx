@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { MemberActions } from "./member-actions";
+import { CopyInviteCard } from "./copy-invite-card";
 
 const ROLE_LABELS: Record<string, string> = {
   creator: "ادمین اصلی",
@@ -79,37 +80,9 @@ export default async function MembersPage({
         ))}
 
         {/* Invite Link */}
-        <Card className="mt-5 text-center">
-          <p className="text-[13px] text-text-muted m-0 mb-2.5">🔗 لینک دعوت</p>
-          <div
-            className="bg-input-bg rounded-[10px] px-3.5 py-2.5 text-xs text-accent mb-2.5 break-all cursor-pointer"
-            dir="ltr"
-            onClick={undefined}
-          >
-            {inviteUrl}
-          </div>
-          <CopyButton text={inviteUrl} />
-        </Card>
+        <CopyInviteCard inviteUrl={inviteUrl} />
       </div>
     </div>
   );
 }
 
-function CopyButton({ text }: { text: string }) {
-  return (
-    <form
-      action={async () => {
-        "use server";
-        // Copy happens client-side, this is just a placeholder
-      }}
-    >
-      <button
-        type="button"
-        className="bg-accent text-bg px-3.5 py-2 text-xs rounded-[10px] font-bold cursor-pointer border-none"
-        data-copy={text}
-      >
-        کپی لینک
-      </button>
-    </form>
-  );
-}

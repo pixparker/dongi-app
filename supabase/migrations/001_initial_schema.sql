@@ -6,7 +6,7 @@
 create schema if not exists dongi;
 
 -- Helper: generate short random invite codes
-create or replace function dongi.generate_invite_code(len int default 8)
+create or replace function dongi.generate_invite_code(len int default 6)
 returns text
 language sql
 volatile

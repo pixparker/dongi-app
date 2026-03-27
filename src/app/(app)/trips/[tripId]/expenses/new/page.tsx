@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { PageHeader } from "@/components/ui/page-header";
 import { createClient } from "@/lib/supabase/client";
+import { toLatinNumber } from "@/lib/utils";
 import { createExpense, type ExpenseActionResult } from "../actions";
 
 const SPLIT_MODES = [
@@ -38,6 +39,7 @@ export default function NewExpensePage({
   const today = new Date().toISOString().split("T")[0];
   const [members, setMembers] = useState<Member[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currency, setCurrency] = useState("");
   const [splitMode, setSplitMode] = useState("equal");
   const [selectedPayer, setSelectedPayer] = useState<string>("");
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
@@ -56,6 +58,13 @@ export default function NewExpensePage({
         data: { user },
       } = await supabase.auth.getUser();
       setCurrentUserId(user?.id ?? null);
+
+      const { data: tripData } = await supabase
+        .from("trips")
+        .select("currency")
+        .eq("id", tripId)
+        .single();
+      if (tripData) setCurrency(tripData.currency);
 
       const { data } = await supabase
         .from("trip_members")
@@ -94,19 +103,23 @@ export default function NewExpensePage({
           <InputField label="عنوان" name="title" placeholder="مثلاً: ناهار، بنزین، هتل" icon="✏️" required />
 
           {/* Amount */}
+          <input type="hidden" name="amount" value={toLatinNumber(amount)} />
           <div className="mb-5">
             <label className="block text-xs font-semibold text-text-muted mb-2 text-right">مبلغ</label>
-            <input
-              type="number"
-              name="amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0"
-              required
-              min="0.01"
-              step="0.01"
-              className="w-full bg-input-bg border border-border rounded-[18px] py-5 px-4 text-center text-[32px] font-black text-text-primary outline-none placeholder:text-text-muted"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="۰"
+                required
+                className="w-full bg-input-bg border border-border rounded-[18px] py-5 px-4 text-center text-[32px] font-black text-text-primary outline-none placeholder:text-text-muted"
+              />
+              {currency && (
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-muted">{currency}</span>
+              )}
+            </div>
           </div>
 
           {/* Payer */}

@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { JoinTripButton } from "./join-modal";
 
 const TRIP_EMOJIS = ["🏖️", "🕌", "⛺", "🏔️", "✈️", "🚗", "🎿", "🌴"];
 const TRIP_COLORS = ["#00D68F", "#6B8AFF", "#FFB547", "#FF6B6B", "#A78BFA", "#F472B6"];
@@ -112,12 +113,7 @@ export default async function TripsPage() {
           </Link>
         </div>
 
-        <Card className="mt-4 text-center">
-          <p className="text-[13px] text-text-muted m-0">🔗 لینک دعوت دارید؟</p>
-          <Button variant="ghost" size="sm" className="mt-2">
-            پیوستن به سفر
-          </Button>
-        </Card>
+        <JoinTripButton />
       </div>
     </div>
   );

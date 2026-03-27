@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { toLatinNumber } from "@/lib/utils";
 
 export type ExpenseActionResult = {
   error?: string;
@@ -18,7 +19,7 @@ export async function createExpense(
   if (!user) return { error: "ابتدا وارد شوید" };
 
   const title = (formData.get("title") as string)?.trim();
-  const amount = parseFloat(formData.get("amount") as string);
+  const amount = parseFloat(toLatinNumber(formData.get("amount") as string));
   const payerId = formData.get("payer_id") as string;
   const category = (formData.get("category") as string) || "other";
   const splitMode = (formData.get("split_mode") as string) || "equal";
@@ -86,7 +87,7 @@ export async function createExpense(
     }));
   } else if (splitMode === "percentage") {
     shares = participantIds.map((uid) => {
-      const pct = parseFloat((formData.get(`share_${uid}`) as string) || "0");
+      const pct = parseFloat(toLatinNumber((formData.get(`share_${uid}`) as string) || "0"));
       return {
         expense_id: expense.id,
         user_id: uid,
@@ -97,7 +98,7 @@ export async function createExpense(
     shares = participantIds.map((uid) => ({
       expense_id: expense.id,
       user_id: uid,
-      share: parseFloat((formData.get(`share_${uid}`) as string) || "0"),
+      share: parseFloat(toLatinNumber((formData.get(`share_${uid}`) as string) || "0")),
     }));
   }
 

@@ -10,7 +10,7 @@ import { logout } from "@/app/(auth)/actions";
 export default function UserSettingsPage() {
   const { profile, isLoading } = useSession();
 
-  const displayName = profile?.username ?? "...";
+  const displayName = profile?.display_name ?? profile?.username ?? "...";
 
   return (
     <div className="min-h-screen bg-bg direction-rtl">

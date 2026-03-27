@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { toLatinNumber } from "@/lib/utils";
 
 export type PaymentActionResult = {
   error?: string;
@@ -19,7 +20,7 @@ export async function createPayment(
 
   const fromUserId = formData.get("from_user_id") as string;
   const toUserId = formData.get("to_user_id") as string;
-  const amount = parseFloat(formData.get("amount") as string);
+  const amount = parseFloat(toLatinNumber(formData.get("amount") as string));
   const date = (formData.get("date") as string) || new Date().toISOString().split("T")[0];
 
   if (!fromUserId || !toUserId) return { error: "پرداخت‌کننده و دریافت‌کننده الزامی است" };

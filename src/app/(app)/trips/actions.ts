@@ -27,7 +27,7 @@ export async function createTrip(formData: FormData): Promise<TripActionResult> 
   // Get the user's profile for display_name
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("username")
+    .select("username, display_name")
     .eq("id", user.id)
     .single();
 
@@ -57,7 +57,7 @@ export async function createTrip(formData: FormData): Promise<TripActionResult> 
   const { error: memberError } = await supabase.from("trip_members").insert({
     trip_id: trip.id,
     user_id: user.id,
-    display_name: profile?.username ?? "کاربر",
+    display_name: profile?.display_name ?? profile?.username ?? "کاربر",
     role: "creator",
   });
 

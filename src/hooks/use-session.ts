@@ -7,6 +7,7 @@ import type { User } from "@supabase/supabase-js";
 type Profile = {
   id: string;
   username: string;
+  display_name: string | null;
 };
 
 export function useSession() {
@@ -26,7 +27,7 @@ export function useSession() {
       if (user) {
         const { data } = await supabase
           .from("profiles")
-          .select("id, username")
+          .select("id, username, display_name")
           .eq("id", user.id)
           .single();
         setProfile(data);

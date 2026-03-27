@@ -6,6 +6,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { createClient } from "@/lib/supabase/client";
+import { toLatinNumber } from "@/lib/utils";
 import { createPayment, type PaymentActionResult } from "../actions";
 
 type Member = {
@@ -30,6 +31,7 @@ function PaymentForm({ tripId }: { tripId: string }) {
   const searchParams = useSearchParams();
   const today = new Date().toISOString().split("T")[0];
   const [members, setMembers] = useState<Member[]>([]);
+  const [currency, setCurrency] = useState("");
   const [fromUserId, setFromUserId] = useState(searchParams.get("from") ?? "");
   const [toUserId, setToUserId] = useState(searchParams.get("to") ?? "");
   const [amount, setAmount] = useState(searchParams.get("amount") ?? "");
@@ -41,6 +43,8 @@ function PaymentForm({ tripId }: { tripId: string }) {
 
   useEffect(() => {
     const supabase = createClient();
+    supabase.from("trips").select("currency").eq("id", tripId).single()
+      .then(({ data }) => { if (data) setCurrency(data.currency); });
     supabase
       .from("trip_members")
       .select("user_id, display_name")
@@ -136,19 +140,23 @@ function PaymentForm({ tripId }: { tripId: string }) {
           )}
 
           {/* Amount */}
+          <input type="hidden" name="amount" value={toLatinNumber(amount)} />
           <div className="text-center mb-7">
             <label className="block text-xs font-semibold text-text-muted mb-2">مبلغ پرداخت</label>
-            <input
-              type="number"
-              name="amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0"
-              required
-              min="0.01"
-              step="0.01"
-              className="w-full bg-input-bg border border-border rounded-[18px] py-6 px-4 text-center text-[36px] font-black text-accent outline-none placeholder:text-text-muted"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="۰"
+                required
+                className="w-full bg-input-bg border border-border rounded-[18px] py-6 px-4 text-center text-[36px] font-black text-accent outline-none placeholder:text-text-muted"
+              />
+              {currency && (
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-muted">{currency}</span>
+              )}
+            </div>
           </div>
 
           {state.error && (
