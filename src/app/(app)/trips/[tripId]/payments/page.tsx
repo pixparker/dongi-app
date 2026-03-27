@@ -7,6 +7,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { calculateMemberBalances, calculateSettlements } from "@/lib/calculations";
+import { currencySymbol } from "@/lib/constants";
 
 export default async function PaymentsPage({
   params,
@@ -67,7 +68,7 @@ export default async function PaymentsPage({
   const memberMap = Object.fromEntries(
     members?.map((m) => [m.user_id, m.display_name]) ?? []
   );
-  const currency = trip?.currency ?? "";
+  const currency = currencySymbol(trip?.currency ?? "");
 
   return (
     <div className="min-h-screen bg-bg flex flex-col direction-rtl">

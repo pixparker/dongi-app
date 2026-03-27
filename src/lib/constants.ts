@@ -16,3 +16,17 @@ export const EXPENSE_CATEGORIES = [
   "other",
 ] as const;
 export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
+
+export const CURRENCY_SYMBOLS: Record<string, string> = {
+  TRY: "₺",
+  IRR: "﷼",
+  IRT: "تومان",
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+  AED: "د.إ",
+};
+
+export function currencySymbol(code: string): string {
+  return CURRENCY_SYMBOLS[code.toUpperCase()] ?? code;
+}

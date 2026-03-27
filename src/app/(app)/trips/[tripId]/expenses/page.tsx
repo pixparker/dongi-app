@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { currencySymbol } from "@/lib/constants";
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: "🍕",
@@ -49,7 +50,7 @@ export default async function ExpensesPage({
     members?.map((m) => [m.user_id, m.display_name]) ?? []
   );
 
-  const currency = trip?.currency ?? "";
+  const currency = currencySymbol(trip?.currency ?? "");
 
   return (
     <div className="min-h-screen bg-bg direction-rtl">

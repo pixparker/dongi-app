@@ -7,6 +7,7 @@ import { InputField } from "@/components/ui/input-field";
 import { PageHeader } from "@/components/ui/page-header";
 import { createClient } from "@/lib/supabase/client";
 import { toLatinNumber } from "@/lib/utils";
+import { currencySymbol } from "@/lib/constants";
 import { createExpense, type ExpenseActionResult } from "../actions";
 
 const SPLIT_MODES = [
@@ -117,7 +118,7 @@ export default function NewExpensePage({
                 className="w-full bg-input-bg border border-border rounded-[18px] py-5 px-4 text-center text-[32px] font-black text-text-primary outline-none placeholder:text-text-muted"
               />
               {currency && (
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-muted">{currency}</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-muted">{currencySymbol(currency)}</span>
               )}
             </div>
           </div>
@@ -169,58 +170,63 @@ export default function NewExpensePage({
           {/* Participants */}
           <div className="mb-4">
             <label className="block text-xs font-semibold text-text-muted mb-2 text-right">افراد شریک</label>
-            {members.map((m, i) => (
-              <div
-                key={m.user_id}
-                className={`flex items-center justify-between py-2.5 ${
-                  i < members.length - 1 ? "border-b border-border" : ""
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Avatar name={m.display_name} size={30} />
-                  <span className="text-sm text-text-primary">{m.display_name}</span>
+            {members.map((m, i) => {
+              const isSelected = selectedParticipants.includes(m.user_id);
+              return (
+                <div
+                  key={m.user_id}
+                  onClick={() => toggleParticipant(m.user_id)}
+                  className={`flex items-center justify-between py-2.5 cursor-pointer transition-opacity ${
+                    i < members.length - 1 ? "border-b border-border" : ""
+                  } ${!isSelected ? "opacity-40" : ""}`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Avatar name={m.display_name} size={30} />
+                    <span className={`text-sm ${isSelected ? "text-text-primary" : "text-text-muted line-through"}`}>
+                      {m.display_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    {splitMode === "equal" && isSelected && (
+                      <span className="text-[13px] text-text-muted">{sharePercent}٪</span>
+                    )}
+                    {splitMode === "percentage" && isSelected && (
+                      <input
+                        type="number"
+                        name={`share_${m.user_id}`}
+                        placeholder="٪"
+                        min="0"
+                        max="100"
+                        className="w-16 bg-input-bg border border-border rounded-lg px-2 py-1 text-center text-sm text-text-primary outline-none"
+                      />
+                    )}
+                    {splitMode === "fixed" && isSelected && (
+                      <input
+                        type="number"
+                        name={`share_${m.user_id}`}
+                        placeholder="مبلغ"
+                        min="0"
+                        step="0.01"
+                        className="w-20 bg-input-bg border border-border rounded-lg px-2 py-1 text-center text-sm text-text-primary outline-none"
+                      />
+                    )}
+                    {isSelected && (
+                      <input type="hidden" name="participants" value={m.user_id} />
+                    )}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); toggleParticipant(m.user_id); }}
+                      className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold cursor-pointer transition-all ${
+                        isSelected
+                          ? "bg-accent text-bg"
+                          : "bg-input-bg border-[1.5px] border-border text-text-muted"
+                      }`}
+                    >
+                      {isSelected ? "✓" : ""}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {splitMode === "equal" && selectedParticipants.includes(m.user_id) && (
-                    <span className="text-[13px] text-text-muted">{sharePercent}٪</span>
-                  )}
-                  {splitMode === "percentage" && selectedParticipants.includes(m.user_id) && (
-                    <input
-                      type="number"
-                      name={`share_${m.user_id}`}
-                      placeholder="٪"
-                      min="0"
-                      max="100"
-                      className="w-16 bg-input-bg border border-border rounded-lg px-2 py-1 text-center text-sm text-text-primary outline-none"
-                    />
-                  )}
-                  {splitMode === "fixed" && selectedParticipants.includes(m.user_id) && (
-                    <input
-                      type="number"
-                      name={`share_${m.user_id}`}
-                      placeholder="مبلغ"
-                      min="0"
-                      step="0.01"
-                      className="w-20 bg-input-bg border border-border rounded-lg px-2 py-1 text-center text-sm text-text-primary outline-none"
-                    />
-                  )}
-                  {selectedParticipants.includes(m.user_id) && (
-                    <input type="hidden" name="participants" value={m.user_id} />
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => toggleParticipant(m.user_id)}
-                    className={`w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold cursor-pointer transition-all border-none ${
-                      selectedParticipants.includes(m.user_id)
-                        ? "bg-accent text-bg"
-                        : "bg-input-bg text-text-muted"
-                    }`}
-                  >
-                    {selectedParticipants.includes(m.user_id) ? "✓" : ""}
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Category */}
@@ -252,7 +258,11 @@ export default function NewExpensePage({
             <p className="text-danger text-sm mb-3">{state.error}</p>
           )}
 
-          <Button full size="lg" disabled={pending}>
+          {selectedParticipants.length === 0 && (
+            <p className="text-xs text-center mb-3" style={{ color: "var(--color-warning)" }}>حداقل یک نفر باید شریک هزینه باشد</p>
+          )}
+
+          <Button full size="lg" disabled={pending || selectedParticipants.length === 0}>
             {pending ? "..." : "ثبت هزینه ✓"}
           </Button>
         </form>

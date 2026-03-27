@@ -15,7 +15,7 @@ export function BottomNav({ tripId }: { tripId: string }) {
 
   const items: NavItem[] = [
     { id: "dashboard", icon: "📊", label: "داشبورد", href: `/trips/${tripId}` },
-    { id: "addExpense", icon: "➕", label: "هزینه", href: `/trips/${tripId}/expenses/new` },
+    { id: "addExpense", icon: "💸", label: "هزینه", href: `/trips/${tripId}/expenses/new` },
     { id: "settlement", icon: "💰", label: "تسویه", href: `/trips/${tripId}/payments` },
     { id: "history", icon: "📋", label: "تاریخچه", href: `/trips/${tripId}/history` },
   ];

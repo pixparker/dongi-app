@@ -7,6 +7,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { calculateMemberBalances } from "@/lib/calculations";
+import { currencySymbol } from "@/lib/constants";
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: "🍕",
@@ -117,12 +118,12 @@ export default async function TripDashboardPage({
           <p className="text-[32px] font-black text-accent tracking-tight m-0">
             {totalExpenses.toLocaleString()}
           </p>
-          <p className="text-[13px] text-text-muted m-0">{trip.currency}</p>
+          <p className="text-[13px] text-text-muted m-0">{currencySymbol(trip.currency)}</p>
           <div className="flex justify-center gap-4 mt-3.5 pt-3.5 border-t border-accent/15">
             <div>
               <p className="text-[11px] text-text-muted m-0">سهم هر نفر</p>
               <p className="text-base font-bold text-text-primary m-0">
-                {memberCount > 0 ? Math.round(totalExpenses / memberCount).toLocaleString() : 0} {trip.currency}
+                {memberCount > 0 ? Math.round(totalExpenses / memberCount).toLocaleString() : 0} {currencySymbol(trip.currency)}
               </p>
             </div>
             <div className="w-px bg-accent/15" />
@@ -149,13 +150,13 @@ export default async function TripDashboardPage({
                   />
                 </div>
                 <div className="flex justify-between mt-1">
-                  <span className="text-[11px] text-text-muted">پرداخت: {m.paid.toLocaleString()} {trip.currency}</span>
+                  <span className="text-[11px] text-text-muted">پرداخت: {m.paid.toLocaleString()} {currencySymbol(trip.currency)}</span>
                   <span
                     className={`text-[13px] font-bold ${
                       m.status === "طلبکار" ? "text-accent" : "text-danger"
                     }`}
                   >
-                    {m.balance >= 0 ? "+" : ""}{m.balance.toLocaleString()} {trip.currency}
+                    {m.balance >= 0 ? "+" : ""}{m.balance.toLocaleString()} {currencySymbol(trip.currency)}
                   </span>
                 </div>
               </div>
@@ -180,7 +181,7 @@ export default async function TripDashboardPage({
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-semibold text-text-primary">{e.title}</span>
                     <span className="text-sm font-bold text-text-primary">
-                      {Number(e.amount).toLocaleString()} {trip.currency}
+                      {Number(e.amount).toLocaleString()} {currencySymbol(trip.currency)}
                     </span>
                   </div>
                   <div className="flex justify-between mt-1">

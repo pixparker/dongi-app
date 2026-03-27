@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { currencySymbol } from "@/lib/constants";
 import { JoinTripButton } from "./join-modal";
 
 const TRIP_EMOJIS = ["🏖️", "🕌", "⛺", "🏔️", "✈️", "🚗", "🎿", "🌴"];
@@ -95,7 +96,7 @@ export default async function TripsPage() {
                       👥 {trip.memberCount} نفر
                     </span>
                     <span className="text-xs text-text-muted">
-                      💰 {trip.currency}
+                      💰 {currencySymbol(trip.currency)}
                     </span>
                   </div>
                 </div>

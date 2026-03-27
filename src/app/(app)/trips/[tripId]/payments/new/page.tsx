@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { createClient } from "@/lib/supabase/client";
 import { toLatinNumber } from "@/lib/utils";
+import { currencySymbol } from "@/lib/constants";
 import { createPayment, type PaymentActionResult } from "../actions";
 
 type Member = {
@@ -154,7 +155,7 @@ function PaymentForm({ tripId }: { tripId: string }) {
                 className="w-full bg-input-bg border border-border rounded-[18px] py-6 px-4 text-center text-[36px] font-black text-accent outline-none placeholder:text-text-muted"
               />
               {currency && (
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-muted">{currency}</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-muted">{currencySymbol(currency)}</span>
               )}
             </div>
           </div>
