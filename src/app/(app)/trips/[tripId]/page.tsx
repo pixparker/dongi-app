@@ -1,6 +1,4 @@
-import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { StatusPill } from "@/components/ui/status-pill";
 import { PageHeader } from "@/components/ui/page-header";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import Link from "next/link";
@@ -11,6 +9,7 @@ import { currencySymbol } from "@/lib/constants";
 import { ExpenseApprovalButtons } from "./expenses/expense-actions";
 import { ExpensePieChart } from "@/components/charts/expense-pie-chart";
 import { ExpenseAccordion } from "@/components/expenses/expense-accordion";
+import { MemberBalanceList } from "@/components/members/member-balance-list";
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: "🍕",
@@ -130,15 +129,22 @@ export default async function TripDashboardPage({
         <div className="bg-accent/8 border border-accent/20 rounded-[18px] p-5 mb-4 text-center">
           <p className="text-xs text-text-muted mb-1 m-0">مجموع هزینه سفر</p>
           <p className="text-[32px] font-black text-accent tracking-tight m-0">
-            {totalExpenses.toLocaleString()}
+            {totalExpenses.toLocaleString()} {currencySymbol(trip.currency)}
           </p>
-          <p className="text-[13px] text-text-muted m-0">{currencySymbol(trip.currency)}</p>
           <div className="flex justify-center gap-4 mt-3.5 pt-3.5 border-t border-accent/15">
             <div>
-              <p className="text-[11px] text-text-muted m-0">سهم هر نفر</p>
+              <p className="text-[11px] text-text-muted m-0">سهم شما</p>
               <p className="text-base font-bold text-text-primary m-0">
-                {memberCount > 0 ? Math.round(totalExpenses / memberCount).toLocaleString() : 0} {currencySymbol(trip.currency)}
+                {(() => {
+                  const myBalance = balanceResults.find((b) => b.userId === user.id);
+                  return myBalance ? myBalance.totalShare.toLocaleString() : 0;
+                })()} {currencySymbol(trip.currency)}
               </p>
+            </div>
+            <div className="w-px bg-accent/15" />
+            <div>
+              <p className="text-[11px] text-text-muted m-0">تراکنش‌ها</p>
+              <p className="text-base font-bold text-text-primary m-0">{approvedExpenses.length + (payments?.length ?? 0)}</p>
             </div>
             <div className="w-px bg-accent/15" />
             <div>
@@ -150,33 +156,11 @@ export default async function TripDashboardPage({
 
         {/* Members Balance */}
         <h3 className="text-sm font-bold text-text-primary mb-2.5 mt-0">وضعیت اعضا</h3>
-        {memberBalances.map((m) => (
-          <Card key={m.id} className="mb-2 !p-3">
-            <div className="flex items-center gap-3">
-              <Avatar name={m.display_name} size={38} />
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-semibold text-text-primary">{m.display_name}</span>
-                  <StatusPill
-                    label={m.status}
-                    color={m.status === "طلبکار" ? "var(--color-accent)" : "var(--color-danger)"}
-                    bgColor={m.status === "طلبکار" ? "var(--color-accent-soft)" : "var(--color-danger-soft)"}
-                  />
-                </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-[11px] text-text-muted">پرداخت: {m.paid.toLocaleString()} {currencySymbol(trip.currency)}</span>
-                  <span
-                    className={`text-[13px] font-bold ${
-                      m.status === "طلبکار" ? "text-accent" : "text-danger"
-                    }`}
-                  >
-                    {m.balance >= 0 ? "+" : ""}{m.balance.toLocaleString()} {currencySymbol(trip.currency)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        ))}
+        <MemberBalanceList
+          members={memberBalances}
+          currency={currencySymbol(trip.currency)}
+          currentUserId={user.id}
+        />
 
         {/* Category Breakdown */}
         {approvedExpenses.length > 0 && (

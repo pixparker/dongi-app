@@ -47,6 +47,7 @@ export default function NewExpensePage({
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
   const [category, setCategory] = useState("other");
   const [amount, setAmount] = useState("");
+  const [shareValues, setShareValues] = useState<Record<string, string>>({});
 
   const [state, formAction, pending] = useActionState<ExpenseActionResult, FormData>(
     (_prev, formData) => createExpense(tripId, formData),
@@ -99,6 +100,24 @@ export default function NewExpensePage({
     selectedParticipants.length > 0
       ? Math.round(100 / selectedParticipants.length)
       : 0;
+
+  const parsedAmount = parseFloat(toLatinNumber(amount) || "0");
+
+  // Compute share totals for validation
+  const shareTotal = selectedParticipants.reduce((sum, uid) => {
+    const val = parseFloat(toLatinNumber(shareValues[uid] || "0"));
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
+
+  const hasEnteredShares =
+    splitMode !== "equal" &&
+    selectedParticipants.some((uid) => shareValues[uid] !== undefined && shareValues[uid] !== "");
+
+  const isShareValid =
+    splitMode === "equal" ||
+    !hasEnteredShares ||
+    (splitMode === "percentage" && Math.abs(shareTotal - 100) < 0.01) ||
+    (splitMode === "fixed" && parsedAmount > 0 && Math.abs(shareTotal - parsedAmount) < 0.01);
 
   return (
     <div className="min-h-screen bg-bg direction-rtl">
@@ -201,6 +220,8 @@ export default function NewExpensePage({
                         inputMode="decimal"
                         name={`share_${m.user_id}`}
                         placeholder="٪"
+                        value={shareValues[m.user_id] ?? ""}
+                        onChange={(e) => setShareValues((prev) => ({ ...prev, [m.user_id]: e.target.value }))}
                         className="w-16 bg-input-bg border border-border rounded-lg px-2 py-1 text-center text-sm text-text-primary outline-none"
                       />
                     )}
@@ -210,6 +231,8 @@ export default function NewExpensePage({
                         inputMode="decimal"
                         name={`share_${m.user_id}`}
                         placeholder="مبلغ"
+                        value={shareValues[m.user_id] ?? ""}
+                        onChange={(e) => setShareValues((prev) => ({ ...prev, [m.user_id]: e.target.value }))}
                         className="w-20 bg-input-bg border border-border rounded-lg px-2 py-1 text-center text-sm text-text-primary outline-none"
                       />
                     )}
@@ -231,6 +254,18 @@ export default function NewExpensePage({
               );
             })}
           </div>
+
+          {/* Share validation summary */}
+          {hasEnteredShares && splitMode === "percentage" && (
+            <div className={`text-xs text-center mb-3 font-semibold ${isShareValid ? "text-accent" : "text-danger"}`}>
+              مجموع: {Math.round(shareTotal * 100) / 100}٪ از ۱۰۰٪
+            </div>
+          )}
+          {hasEnteredShares && splitMode === "fixed" && (
+            <div className={`text-xs text-center mb-3 font-semibold ${isShareValid ? "text-accent" : "text-danger"}`}>
+              مجموع: {Math.round(shareTotal).toLocaleString("fa-IR")} از {Math.round(parsedAmount).toLocaleString("fa-IR")}
+            </div>
+          )}
 
           {/* Category */}
           <input type="hidden" name="category" value={category} />
@@ -274,7 +309,7 @@ export default function NewExpensePage({
             <p className="text-xs text-center mb-3" style={{ color: "var(--color-warning)" }}>حداقل یک نفر باید شریک هزینه باشد</p>
           )}
 
-          <Button full size="lg" disabled={pending || selectedParticipants.length === 0}>
+          <Button full size="lg" disabled={pending || selectedParticipants.length === 0 || !isShareValid}>
             {pending ? "..." : "ثبت هزینه ✓"}
           </Button>
         </form>

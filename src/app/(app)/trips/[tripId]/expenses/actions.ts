@@ -33,6 +33,21 @@ export async function createExpense(
   if (!payerId) return { error: "پرداخت‌کننده را انتخاب کنید" };
   if (participantIds.length === 0) return { error: "حداقل یک نفر باید شریک باشد" };
 
+  // Validate share totals for percentage/fixed modes
+  if (splitMode === "percentage") {
+    const totalPct = participantIds.reduce((sum, uid) => {
+      const val = parseFloat(toLatinNumber((formData.get(`share_${uid}`) as string) || "0"));
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+    if (Math.abs(totalPct - 100) > 0.01) return { error: "مجموع درصدها باید ۱۰۰٪ باشد" };
+  } else if (splitMode === "fixed") {
+    const totalFixed = participantIds.reduce((sum, uid) => {
+      const val = parseFloat(toLatinNumber((formData.get(`share_${uid}`) as string) || "0"));
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+    if (Math.abs(totalFixed - amount) > 0.01) return { error: "مجموع مبالغ باید برابر کل هزینه باشد" };
+  }
+
   // Check if trip requires approval and user is not admin
   const { data: trip } = await supabase
     .from("trips")
@@ -201,6 +216,21 @@ export async function updateExpense(
   if (!amount || amount <= 0) return { error: "مبلغ باید بزرگتر از صفر باشد" };
   if (!payerId) return { error: "پرداخت‌کننده را انتخاب کنید" };
   if (participantIds.length === 0) return { error: "حداقل یک نفر باید شریک باشد" };
+
+  // Validate share totals for percentage/fixed modes
+  if (splitMode === "percentage") {
+    const totalPct = participantIds.reduce((sum, uid) => {
+      const val = parseFloat(toLatinNumber((formData.get(`share_${uid}`) as string) || "0"));
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+    if (Math.abs(totalPct - 100) > 0.01) return { error: "مجموع درصدها باید ۱۰۰٪ باشد" };
+  } else if (splitMode === "fixed") {
+    const totalFixed = participantIds.reduce((sum, uid) => {
+      const val = parseFloat(toLatinNumber((formData.get(`share_${uid}`) as string) || "0"));
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+    if (Math.abs(totalFixed - amount) > 0.01) return { error: "مجموع مبالغ باید برابر کل هزینه باشد" };
+  }
 
   // Get before state for audit
   const { data: before } = await supabase
