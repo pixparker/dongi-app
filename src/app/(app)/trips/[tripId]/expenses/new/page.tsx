@@ -120,10 +120,10 @@ export default function NewExpensePage({
     (splitMode === "fixed" && parsedAmount > 0 && Math.abs(shareTotal - parsedAmount) < 0.01);
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <>
       <PageHeader title="ثبت هزینه" backHref={`/trips/${tripId}`} />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <form action={formAction}>
           <InputField label="عنوان" name="title" placeholder="مثلاً: ناهار، بنزین، هتل" icon="✏️" required />
 
@@ -314,6 +314,6 @@ export default function NewExpensePage({
           </Button>
         </form>
       </div>
-    </div>
+    </>
   );
 }

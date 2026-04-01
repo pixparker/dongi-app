@@ -51,10 +51,10 @@ export default async function MembersPage({
   const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001"}/invite/${trip.invite_code}`;
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <>
       <PageHeader title="اعضای سفر" backHref={`/trips/${tripId}`} />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         {members?.map((m) => (
           <Card key={m.id} className="mb-2 !py-3.5 !px-4">
             <div className="flex items-center gap-3.5">
@@ -82,7 +82,7 @@ export default async function MembersPage({
         {/* Invite Link */}
         <CopyInviteCard inviteUrl={inviteUrl} />
       </div>
-    </div>
+    </>
   );
 }
 

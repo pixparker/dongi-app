@@ -125,7 +125,7 @@ export default function EditExpensePage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg direction-rtl">
+      <>
         <PageHeader title="ویرایش هزینه" backHref={`/trips/${tripId}/expenses`} />
         <div className="px-5 pb-6 space-y-4">
           <Skeleton className="h-12 w-full" />
@@ -139,12 +139,12 @@ export default function EditExpensePage({
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-10 w-full" />
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <>
       <PageHeader title="ویرایش هزینه" backHref={`/trips/${tripId}/expenses`} />
 
       <div className="px-5 pb-6">
@@ -301,6 +301,6 @@ export default function EditExpensePage({
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

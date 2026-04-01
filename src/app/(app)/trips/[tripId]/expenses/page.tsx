@@ -52,10 +52,10 @@ export default async function ExpensesPage({
   const currency = currencySymbol(trip?.currency ?? "");
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <>
       <PageHeader title="هزینه‌ها" backHref={`/trips/${tripId}`} />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <FilterableExpenseList
           expenses={(expenses ?? []).map((e) => ({ ...e, amount: Number(e.amount) }))}
           shares={shares}
@@ -71,6 +71,6 @@ export default async function ExpensesPage({
           </Button>
         </Link>
       </div>
-    </div>
+    </>
   );
 }

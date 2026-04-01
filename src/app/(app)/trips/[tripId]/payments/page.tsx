@@ -2,7 +2,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
-import { BottomNav } from "@/components/layout/bottom-nav";
+
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -71,7 +71,7 @@ export default async function PaymentsPage({
   const currency = currencySymbol(trip?.currency ?? "");
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col direction-rtl">
+    <>
       <PageHeader title="تسویه حساب" backHref={`/trips/${tripId}`} />
 
       <div className="flex-1 overflow-y-auto px-5 pb-4">
@@ -133,8 +133,6 @@ export default async function PaymentsPage({
           <p className="text-text-muted text-sm text-center py-4">هنوز هزینه‌ای ثبت نشده</p>
         )}
       </div>
-
-      <BottomNav tripId={tripId} />
-    </div>
+    </>
   );
 }

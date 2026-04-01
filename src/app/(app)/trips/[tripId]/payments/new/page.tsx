@@ -59,10 +59,10 @@ function PaymentForm({ tripId }: { tripId: string }) {
   const toMember = members.find((m) => m.user_id === toUserId);
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <>
       <PageHeader title="ثبت پرداخت" backHref={`/trips/${tripId}/payments`} />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <p className="text-[13px] text-text-muted text-center mb-6">
           پرداخت مستقیم بین دو نفر
         </p>
@@ -169,6 +169,6 @@ function PaymentForm({ tripId }: { tripId: string }) {
           </Button>
         </form>
       </div>
-    </div>
+    </>
   );
 }

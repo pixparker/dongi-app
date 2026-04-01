@@ -96,15 +96,15 @@ export default function TripSettingsPage({
 
   if (!trip) {
     return (
-      <div className="min-h-screen bg-bg direction-rtl">
+      <>
         <PageHeader title="تنظیمات سفر" backHref={`/trips/${tripId}`} />
         <div className="px-5 py-8 text-center text-text-muted">...</div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <>
       <PageHeader title="تنظیمات سفر" backHref={`/trips/${tripId}`} />
 
       <div className="px-5 pb-6">
@@ -214,6 +214,6 @@ export default function TripSettingsPage({
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

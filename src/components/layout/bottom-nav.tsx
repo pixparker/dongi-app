@@ -15,6 +15,7 @@ export function BottomNav({ tripId }: { tripId: string }) {
 
   const items: NavItem[] = [
     { id: "dashboard", icon: "📊", label: "داشبورد", href: `/trips/${tripId}` },
+    { id: "expenses", icon: "🧾", label: "هزینه‌ها", href: `/trips/${tripId}/expenses` },
     { id: "addExpense", icon: "+", label: "هزینه", href: `/trips/${tripId}/expenses/new` },
     { id: "settlement", icon: "💰", label: "تسویه", href: `/trips/${tripId}/payments` },
     { id: "history", icon: "📋", label: "تاریخچه", href: `/trips/${tripId}/history` },
@@ -22,6 +23,8 @@ export function BottomNav({ tripId }: { tripId: string }) {
 
   function isActive(item: NavItem) {
     if (item.id === "dashboard") return pathname === `/trips/${tripId}`;
+    if (item.id === "addExpense") return pathname === `/trips/${tripId}/expenses/new`;
+    if (item.id === "expenses") return pathname.startsWith(`/trips/${tripId}/expenses`) && pathname !== `/trips/${tripId}/expenses/new`;
     return pathname.startsWith(item.href);
   }
 

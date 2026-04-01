@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
-import { BottomNav } from "@/components/layout/bottom-nav";
+
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
@@ -102,7 +102,7 @@ export default async function TripDashboardPage({
   const recentExpenses = (expenses ?? []).slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col direction-rtl">
+    <>
       <PageHeader
         title={trip.name}
         backHref="/trips"
@@ -220,8 +220,6 @@ export default async function TripDashboardPage({
         />
         <div className="h-4" />
       </div>
-
-      <BottomNav tripId={tripId} />
-    </div>
+    </>
   );
 }

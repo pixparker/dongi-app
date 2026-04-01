@@ -28,7 +28,7 @@ export default async function SharePage({
   const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001"}/invite/${trip.invite_code}`;
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 direction-rtl">
+    <div className="flex-1 flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm text-center">
         <div className="text-[64px] mb-4">🎉</div>
         <h1 className="text-2xl font-extrabold text-accent mb-2">

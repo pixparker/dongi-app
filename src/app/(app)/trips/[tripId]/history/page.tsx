@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header";
-import { BottomNav } from "@/components/layout/bottom-nav";
+
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { timeAgo } from "@/lib/utils";
@@ -88,7 +88,7 @@ export default async function HistoryPage({
   );
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col direction-rtl">
+    <>
       <PageHeader title="تاریخچه تغییرات" backHref={`/trips/${tripId}`} />
 
       <div className="flex-1 overflow-y-auto px-5 pb-4">
@@ -122,8 +122,6 @@ export default async function HistoryPage({
           </div>
         ))}
       </div>
-
-      <BottomNav tripId={tripId} />
-    </div>
+    </>
   );
 }

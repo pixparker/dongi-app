@@ -41,7 +41,7 @@ function ExpenseCardSkeleton() {
 
 export default function TripDashboardLoading() {
   return (
-    <div className="min-h-screen bg-bg flex flex-col direction-rtl">
+    <>
       {/* PageHeader skeleton */}
       <div className="px-5 pt-2 pb-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -86,16 +86,6 @@ export default function TripDashboardLoading() {
 
         <div className="h-4" />
       </div>
-
-      {/* BottomNav skeleton */}
-      <nav className="flex justify-around px-3 pt-2 pb-6 bg-card border-t border-border shrink-0">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="flex flex-col items-center gap-1 px-3 py-1.5">
-            <Skeleton className="w-8 h-8 rounded-full" />
-            <Skeleton className="h-2 w-8" />
-          </div>
-        ))}
-      </nav>
-    </div>
+    </>
   );
 }

@@ -16,7 +16,7 @@ function MemberCardSkeleton() {
 
 export default function MembersLoading() {
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <>
       {/* PageHeader skeleton */}
       <div className="px-5 pt-2 pb-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -36,6 +36,6 @@ export default function MembersLoading() {
           <Skeleton className="h-10 w-full rounded-xl" />
         </div>
       </div>
-    </div>
+    </>
   );
 }
