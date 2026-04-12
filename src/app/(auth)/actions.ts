@@ -17,7 +17,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
     return { error: "نام کاربری و رمز عبور الزامی است" };
   }
 
-  const email = `${username.toLowerCase()}@gmail.com`;
+  const email = `${username.toLowerCase()}@dongi.local`;
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -53,7 +53,7 @@ export async function register(formData: FormData): Promise<AuthResult> {
     return { error: "رمز عبور و تکرار آن یکسان نیستند" };
   }
 
-  const email = `${username.toLowerCase()}@gmail.com`;
+  const email = `${username.toLowerCase()}@dongi.local`;
 
   const { error } = await supabase.auth.signUp({
     email,

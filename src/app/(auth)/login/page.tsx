@@ -92,6 +92,9 @@ function LoginForm() {
         <p className="text-text-muted text-[11px] mt-8">
           نسخه PWA · نصب روی هر دستگاهی
         </p>
+        <p className="text-text-muted/50 text-[10px] mt-2">
+          v{process.env.NEXT_PUBLIC_APP_VERSION || "0.1.0"}
+        </p>
       </div>
     </div>
   );
