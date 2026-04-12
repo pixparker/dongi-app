@@ -57,7 +57,7 @@ export function calculateMemberBalances({
       totalShare: b.share,
       received: b.received,
       sent: b.sent,
-      balance: b.paid - b.share + b.received - b.sent,
+      balance: b.paid - b.share + b.sent - b.received,
     };
   });
 }

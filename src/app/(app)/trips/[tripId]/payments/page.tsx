@@ -2,6 +2,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
+import { PaymentAccordion } from "@/components/payments/payment-list-item";
 
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -29,8 +30,11 @@ export default async function PaymentsPage({
 
   const { data: members } = await supabase
     .from("trip_members")
-    .select("user_id, display_name")
+    .select("user_id, display_name, role")
     .eq("trip_id", tripId);
+
+  const currentMember = members?.find((m) => m.user_id === user.id);
+  const isAdmin = currentMember?.role === "creator" || currentMember?.role === "admin";
 
   const { data: expenses } = await supabase
     .from("expenses")
@@ -89,9 +93,14 @@ export default async function PaymentsPage({
           )}
         </div>
 
-        {/* Settlement Cards */}
+        {/* Settlement Cards (pending) */}
         {settlements.map((s, i) => (
-          <Card key={i} className="mb-2.5 !rounded-2xl">
+          <Card key={i} className="mb-2.5 !rounded-2xl !border-dashed !border-warning/50 bg-warning/[0.03]">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--color-warning-soft)", color: "var(--color-warning)" }}>
+                در انتظار انتقال
+              </span>
+            </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <Avatar name={memberMap[s.from] ?? "?"} size={36} />
@@ -132,6 +141,29 @@ export default async function PaymentsPage({
         {settlements.length === 0 && expenses?.length === 0 && (
           <p className="text-text-muted text-sm text-center py-4">هنوز هزینه‌ای ثبت نشده</p>
         )}
+
+        {/* Completed payments list */}
+        {(payments ?? []).length > 0 && (
+          <>
+            <h3 className="text-sm font-bold text-text-primary mt-6 mb-2.5">
+              انتقالات انجام‌شده
+            </h3>
+            <PaymentAccordion
+              payments={(payments ?? []).map((p) => ({ ...p, amount: Number(p.amount) }))}
+              members={members?.map((m) => ({ user_id: m.user_id, display_name: m.display_name })) ?? []}
+              currency={currency}
+              tripId={tripId}
+              isAdmin={isAdmin}
+            />
+          </>
+        )}
+
+        {/* Manual / free transfer */}
+        <Link href={`/trips/${tripId}/payments/new`} className="block mt-4">
+          <Button full variant="secondary" size="lg">
+            ثبت انتقال دستی
+          </Button>
+        </Link>
       </div>
     </>
   );
