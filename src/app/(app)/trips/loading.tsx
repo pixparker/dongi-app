@@ -19,14 +19,14 @@ function TripCardSkeleton() {
 
 export default function TripsLoading() {
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <div className="h-full flex flex-col bg-bg direction-rtl">
       {/* PageHeader skeleton */}
       <div className="px-5 pt-2 pb-3 flex items-center justify-between shrink-0">
         <Skeleton className="h-7 w-28" />
         <Skeleton className="h-6 w-6 rounded-full" />
       </div>
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <TripCardSkeleton />
         <TripCardSkeleton />
         <TripCardSkeleton />

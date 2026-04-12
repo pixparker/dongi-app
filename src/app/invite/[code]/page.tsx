@@ -45,7 +45,7 @@ export default async function InvitePage({
   const creatorName = creator?.display_name ?? "دوست شما";
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 direction-rtl">
+    <div className="min-h-full bg-bg flex flex-col items-center justify-center px-6 direction-rtl">
       <div className="w-full max-w-sm text-center">
         <div className="text-[56px] mb-4">🎒</div>
         <h1 className="text-2xl font-extrabold text-text-primary mb-2">

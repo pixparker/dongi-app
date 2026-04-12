@@ -25,7 +25,7 @@ export default function MembersLoading() {
         </div>
       </div>
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <MemberCardSkeleton />
         <MemberCardSkeleton />
         <MemberCardSkeleton />

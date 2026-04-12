@@ -98,7 +98,7 @@ export default function TripSettingsPage({
     return (
       <>
         <PageHeader title="تنظیمات سفر" backHref={`/trips/${tripId}`} />
-        <div className="px-5 py-8 text-center text-text-muted">...</div>
+        <div className="flex-1 overflow-y-auto px-5 py-8 text-center text-text-muted">...</div>
       </>
     );
   }
@@ -107,7 +107,7 @@ export default function TripSettingsPage({
     <>
       <PageHeader title="تنظیمات سفر" backHref={`/trips/${tripId}`} />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <form onSubmit={handleSubmit}>
           <InputField label="نام سفر" name="name" defaultValue={trip.name} icon="✏️" required />
 

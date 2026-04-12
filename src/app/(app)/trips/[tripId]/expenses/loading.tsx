@@ -30,7 +30,7 @@ export default function ExpensesLoading() {
         </div>
       </div>
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <ExpenseCardSkeleton />
         <ExpenseCardSkeleton />
         <ExpenseCardSkeleton />

@@ -75,12 +75,12 @@ export default async function TripsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <div className="h-full flex flex-col bg-bg direction-rtl">
       <PageHeader title="سفرهای من" rightAction={
         <Link href="/settings" className="text-text-muted text-lg no-underline">⚙️</Link>
       } />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         {trips.length === 0 && (
           <div className="text-center py-12">
             <div className="text-[48px] mb-3">🎒</div>
@@ -115,7 +115,9 @@ export default async function TripsPage() {
                     </span>
                   </div>
                 </div>
-                <span className="text-text-muted text-lg">←</span>
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" className="text-text-muted shrink-0">
+                  <path d="M12.5 4L6.5 10L12.5 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </div>
             </Card>
           </Link>

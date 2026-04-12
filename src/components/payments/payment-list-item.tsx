@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 
 type PaymentItem = {
   id: string;
@@ -108,11 +107,12 @@ export function PaymentAccordion({
                 <Link
                   href={`/trips/${tripId}/payments/${p.id}/edit`}
                   onClick={(e) => e.stopPropagation()}
-                  className="block"
+                  className="flex items-center justify-center gap-1.5 w-full mt-1 py-2 rounded-xl bg-card-hover text-text-muted text-xs font-semibold no-underline hover:bg-border transition-colors"
                 >
-                  <Button full variant="secondary" size="sm">
-                    ویرایش
-                  </Button>
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                    <path d="M14.167 2.5a2.357 2.357 0 0 1 3.333 3.333L6.25 17.083l-4.583 1.25 1.25-4.583L14.167 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  ویرایش
                 </Link>
               )}
             </div>

@@ -117,7 +117,7 @@ function EditPaymentForm({
           title="ویرایش پرداخت"
           backHref={`/trips/${tripId}/payments`}
         />
-        <div className="px-5 pb-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5 pb-6 space-y-4">
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-12 w-full" />

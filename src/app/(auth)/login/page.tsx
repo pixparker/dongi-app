@@ -41,7 +41,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 direction-rtl">
+    <div className="min-h-full bg-bg flex flex-col items-center justify-center px-6 direction-rtl">
       <div className="w-full max-w-sm text-center">
         <div className="text-[56px] mb-2">🎒</div>
         <h1 className="text-[32px] font-black text-accent tracking-tight mb-1.5">

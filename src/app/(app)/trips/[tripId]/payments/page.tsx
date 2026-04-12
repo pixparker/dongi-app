@@ -81,16 +81,34 @@ export default async function PaymentsPage({
       <div className="flex-1 overflow-y-auto px-5 pb-4">
         {/* Summary */}
         <div className="bg-accent/8 border border-accent/15 rounded-2xl p-[18px] mb-5 text-center">
-          <p className="text-[13px] text-text-muted m-0">
-            {settlements.length === 0
-              ? "همه تسویه شده‌اند! 🎉"
-              : "کمترین تعداد انتقال برای تسویه کامل"}
-          </p>
-          {settlements.length > 0 && (
-            <p className="text-[28px] font-black text-accent mt-1.5 m-0">
-              {settlements.length} انتقال
-            </p>
+          {settlements.length === 0 && (payments ?? []).length === 0 ? (
+            <p className="text-[13px] text-text-muted m-0">هنوز انتقالی ثبت نشده</p>
+          ) : settlements.length === 0 ? (
+            <p className="text-[13px] text-text-muted m-0">همه تسویه شده‌اند! 🎉</p>
+          ) : (
+            <p className="text-[13px] text-text-muted m-0">کمترین تعداد انتقال برای تسویه کامل</p>
           )}
+          <div className="flex items-center justify-center gap-4 mt-3">
+            {settlements.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[22px] font-black" style={{ color: "var(--color-warning)" }}>
+                  {settlements.length}
+                </span>
+                <span className="text-[13px] text-text-muted">در انتظار</span>
+              </div>
+            )}
+            {settlements.length > 0 && (payments ?? []).length > 0 && (
+              <div className="w-px h-6 bg-accent/15" />
+            )}
+            {(payments ?? []).length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[22px] font-black text-accent">
+                  {(payments ?? []).length}
+                </span>
+                <span className="text-[13px] text-text-muted">پرداخت شده</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Settlement Cards (pending) */}

@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" className={`${vazirmatn.variable} h-full`}>
-      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>{children}</body>
+    <html lang="fa" dir="rtl" className={`${vazirmatn.variable}`}>
+      <body className="h-dvh flex flex-col font-sans bg-bg" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

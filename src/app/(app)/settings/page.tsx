@@ -13,10 +13,10 @@ export default function UserSettingsPage() {
   const displayName = profile?.display_name ?? profile?.username ?? "...";
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <div className="h-full flex flex-col bg-bg direction-rtl">
       <PageHeader title="تنظیمات" backHref="/trips" />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <div className="flex flex-col items-center mb-6">
           <Avatar name={displayName} size={72} />
           <p className="text-text-primary font-bold text-lg mt-3 mb-0">

@@ -127,7 +127,7 @@ export default function EditExpensePage({
     return (
       <>
         <PageHeader title="ویرایش هزینه" backHref={`/trips/${tripId}/expenses`} />
-        <div className="px-5 pb-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5 pb-6 space-y-4">
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-24 w-full" />
           <div className="flex gap-2">
@@ -147,7 +147,7 @@ export default function EditExpensePage({
     <>
       <PageHeader title="ویرایش هزینه" backHref={`/trips/${tripId}/expenses`} />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <InputField label="عنوان" icon="✏️" value={title} onChange={(e) => setTitle(e.target.value)} required />
 
         {/* Amount */}

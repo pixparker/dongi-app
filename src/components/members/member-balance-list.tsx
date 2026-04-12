@@ -12,8 +12,10 @@ type MemberBalance = {
   role: string;
   paid: number;
   share: number;
+  sent: number;
+  received: number;
   balance: number;
-  status: "طلبکار" | "بدهکار";
+  status: "طلبکار" | "بدهکار" | "تسویه";
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -54,10 +56,11 @@ export function MemberBalanceList({
                   </span>
                   <StatusPill
                     label={m.status}
-                    color={m.status === "طلبکار" ? "var(--color-accent)" : "var(--color-danger)"}
-                    bgColor={m.status === "طلبکار" ? "var(--color-accent-soft)" : "var(--color-danger-soft)"}
+                    color={m.status === "تسویه" ? "#60a5fa" : m.status === "طلبکار" ? "var(--color-accent)" : "var(--color-danger)"}
+                    bgColor={m.status === "تسویه" ? "rgba(96,165,250,0.15)" : m.status === "طلبکار" ? "var(--color-accent-soft)" : "var(--color-danger-soft)"}
                   />
                 </div>
+                {m.status !== "تسویه" && (
                 <div className="flex justify-between mt-1">
                   <span className="text-[11px] text-text-muted">پرداخت: {m.paid.toLocaleString()} {currency}</span>
                   <span
@@ -68,6 +71,7 @@ export function MemberBalanceList({
                     {m.balance >= 0 ? "+" : ""}{m.balance.toLocaleString()} {currency}
                   </span>
                 </div>
+                )}
               </div>
               <span className={`text-text-muted text-xs transition-transform ${expanded ? "rotate-90" : ""}`}>
                 ◂
@@ -88,18 +92,39 @@ export function MemberBalanceList({
                   <span className="text-text-muted">سهم از هزینه‌ها</span>
                   <span className="text-text-primary font-semibold">{m.share.toLocaleString()} {currency}</span>
                 </div>
+                {(m.sent > 0 || m.received > 0) && (
+                  <div className="pt-1 border-t border-border/50">
+                    {m.sent > 0 && (
+                      <div className="flex justify-between text-xs py-0.5">
+                        <span className="text-text-muted">انتقال داده</span>
+                        <span className="text-text-primary font-semibold">{m.sent.toLocaleString()} {currency}</span>
+                      </div>
+                    )}
+                    {m.received > 0 && (
+                      <div className="flex justify-between text-xs py-0.5">
+                        <span className="text-text-muted">انتقال گرفته</span>
+                        <span className="text-text-primary font-semibold">{m.received.toLocaleString()} {currency}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="flex justify-between text-xs">
                   <span className="text-text-muted">تراز نهایی</span>
-                  <span className={`font-bold ${m.status === "طلبکار" ? "text-accent" : "text-danger"}`}>
-                    {m.balance >= 0 ? "+" : ""}{m.balance.toLocaleString()} {currency}
+                  <span className={`font-bold ${m.status === "تسویه" ? "text-text-muted" : m.status === "طلبکار" ? "text-accent" : "text-danger"}`}>
+                    {m.status === "تسویه" ? "0" : `${m.balance >= 0 ? "+" : ""}${m.balance.toLocaleString()}`} {currency}
                   </span>
                 </div>
-                {m.balance > 0 && (
+                {m.status === "تسویه" && (
+                  <p className="text-[11px] text-text-muted m-0 pt-1">
+                    این عضو تسویه شده است
+                  </p>
+                )}
+                {m.status === "طلبکار" && (
                   <p className="text-[11px] text-accent m-0 pt-1">
                     این عضو {m.balance.toLocaleString()} {currency} طلبکار است
                   </p>
                 )}
-                {m.balance < 0 && (
+                {m.status === "بدهکار" && (
                   <p className="text-[11px] text-danger m-0 pt-1">
                     این عضو {Math.abs(m.balance).toLocaleString()} {currency} بدهکار است
                   </p>

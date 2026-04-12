@@ -18,10 +18,10 @@ export default function NewTripPage() {
   );
 
   return (
-    <div className="min-h-screen bg-bg direction-rtl">
+    <div className="h-full flex flex-col bg-bg direction-rtl">
       <PageHeader title="سفر جدید" backHref="/trips" />
 
-      <div className="px-5 pb-6">
+      <div className="flex-1 overflow-y-auto px-5 pb-6">
         <form action={formAction}>
           {/* Image Upload placeholder */}
           <div className="w-full h-[120px] rounded-2xl border-2 border-dashed border-accent/25 bg-accent/5 flex flex-col items-center justify-center gap-2 mb-6 cursor-pointer hover:bg-accent/10 transition-colors">

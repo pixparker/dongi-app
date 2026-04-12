@@ -29,7 +29,7 @@ export function BottomNav({ tripId }: { tripId: string }) {
   }
 
   return (
-    <nav className="flex justify-around px-3 pt-2 pb-6 bg-card border-t border-border shrink-0">
+    <nav className="flex justify-around px-3 pt-1.5 pb-2 bg-card border-t border-border shrink-0">
       {items.map((item) => {
         const active = isActive(item);
         return (

@@ -91,8 +91,10 @@ export default async function TripDashboardPage({
       ...m,
       paid: b?.totalPaid ?? 0,
       share: b?.totalShare ?? 0,
+      sent: b?.sent ?? 0,
+      received: b?.received ?? 0,
       balance: b?.balance ?? 0,
-      status: (b?.balance ?? 0) >= 0 ? ("طلبکار" as const) : ("بدهکار" as const),
+      status: Math.abs(b?.balance ?? 0) < 0.01 ? ("تسویه" as const) : (b?.balance ?? 0) > 0 ? ("طلبکار" as const) : ("بدهکار" as const),
     };
   });
 
@@ -107,18 +109,24 @@ export default async function TripDashboardPage({
         title={trip.name}
         backHref="/trips"
         rightAction={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
             <Link
               href={`/trips/${tripId}/settings`}
-              className="text-text-muted text-lg no-underline"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-text-muted hover:bg-card active:bg-card-hover transition-colors no-underline"
             >
-              ⚙️
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16.167 12.5a1.375 1.375 0 0 0 .275 1.517l.05.05a1.667 1.667 0 1 1-2.359 2.358l-.05-.05a1.375 1.375 0 0 0-1.516-.275 1.375 1.375 0 0 0-.834 1.258v.142a1.667 1.667 0 1 1-3.333 0v-.075a1.375 1.375 0 0 0-.9-1.258 1.375 1.375 0 0 0-1.517.275l-.05.05a1.667 1.667 0 1 1-2.358-2.359l.05-.05a1.375 1.375 0 0 0 .275-1.516 1.375 1.375 0 0 0-1.258-.834h-.142a1.667 1.667 0 0 1 0-3.333h.075a1.375 1.375 0 0 0 1.258-.9 1.375 1.375 0 0 0-.275-1.517l-.05-.05A1.667 1.667 0 1 1 5.867 3.575l.05.05a1.375 1.375 0 0 0 1.516.275h.067a1.375 1.375 0 0 0 .833-1.258v-.142a1.667 1.667 0 0 1 3.334 0v.075a1.375 1.375 0 0 0 .833 1.258 1.375 1.375 0 0 0 1.517-.275l.05-.05a1.667 1.667 0 1 1 2.358 2.359l-.05.05a1.375 1.375 0 0 0-.275 1.516v.067a1.375 1.375 0 0 0 1.258.833h.142a1.667 1.667 0 0 1 0 3.334h-.075a1.375 1.375 0 0 0-1.258.833Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </Link>
             <Link
               href={`/trips/${tripId}/members`}
-              className="text-accent text-sm font-semibold no-underline"
+              className="h-9 rounded-xl flex items-center gap-1.5 px-3 text-text-muted hover:bg-card active:bg-card-hover transition-colors no-underline"
             >
-              👥 اعضا
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M14.167 17.5v-1.667a3.333 3.333 0 0 0-3.334-3.333H5.833a3.333 3.333 0 0 0-3.333 3.333V17.5M8.333 9.167a3.333 3.333 0 1 0 0-6.667 3.333 3.333 0 0 0 0 6.667ZM17.5 17.5v-1.667a3.333 3.333 0 0 0-2.5-3.225M12.5 2.608a3.333 3.333 0 0 1 0 6.45" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-xs font-semibold">اعضا</span>
             </Link>
           </div>
         }
