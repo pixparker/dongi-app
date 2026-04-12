@@ -22,6 +22,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    console.error("[login] Supabase error:", error.message, error.status);
     return { error: "نام کاربری یا رمز عبور اشتباه است" };
   }
 

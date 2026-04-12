@@ -3,8 +3,8 @@
 -- ============================================================
 -- Creates 2 test users and a sample trip with expenses.
 -- Login credentials:
---   ali    / password123
---   hossein / password123
+--   ali    / test1234
+--   hossein / test1234
 
 -- 1. Create test users in auth.users
 -- (The trigger will auto-create dongi.profiles rows)
@@ -20,7 +20,7 @@ insert into auth.users (
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
     'ali@dongi.local',
-    crypt('password123', gen_salt('bf')),
+    crypt('test1234', gen_salt('bf')),
     now(), now(), now(),
     '{"username": "ali"}'::jsonb,
     '', '', '', ''
@@ -30,7 +30,7 @@ insert into auth.users (
     '00000000-0000-0000-0000-000000000000',
     'authenticated', 'authenticated',
     'hossein@dongi.local',
-    crypt('password123', gen_salt('bf')),
+    crypt('test1234', gen_salt('bf')),
     now(), now(), now(),
     '{"username": "hossein"}'::jsonb,
     '', '', '', ''
