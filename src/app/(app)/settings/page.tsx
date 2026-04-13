@@ -37,6 +37,10 @@ export default function UserSettingsPage() {
             خروج از حساب
           </Button>
         </form>
+
+        <p className="text-center text-gray-400 text-xs mt-6">
+          نسخه {process.env.NEXT_PUBLIC_APP_VERSION}
+        </p>
       </div>
     </div>
   );
