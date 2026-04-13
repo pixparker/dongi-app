@@ -10,6 +10,7 @@ import { ExpenseApprovalButtons } from "./expenses/expense-actions";
 import { ExpensePieChart } from "@/components/charts/expense-pie-chart";
 import { ExpenseAccordion } from "@/components/expenses/expense-accordion";
 import { MemberBalanceList } from "@/components/members/member-balance-list";
+import { TripPhotoGallery } from "@/components/photos/trip-photo-gallery";
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: "🍕",
@@ -72,6 +73,14 @@ export default async function TripDashboardPage({
     .select("*")
     .eq("trip_id", tripId)
     .eq("is_deleted", false);
+
+  // Fetch trip photos (latest first, limit 9)
+  const { data: tripPhotos } = await supabase
+    .from("trip_photos")
+    .select("id, storage_path, user_id, created_at")
+    .eq("trip_id", tripId)
+    .order("created_at", { ascending: false })
+    .limit(9);
 
   // Calculate balances using shared logic
   const approvedExpenses = expenses?.filter((e) => e.status === "approved") ?? [];
@@ -226,6 +235,17 @@ export default async function TripDashboardPage({
           tripId={tripId}
           isAdmin={isAdmin}
         />
+        {/* Trip Photos */}
+        <div className="mt-4">
+          <TripPhotoGallery
+            tripId={tripId}
+            photos={tripPhotos ?? []}
+            currentUserId={user.id}
+            isAdmin={isAdmin}
+            supabaseUrl={process.env.NEXT_PUBLIC_SUPABASE_URL!}
+          />
+        </div>
+
         <div className="h-4" />
       </div>
     </>
